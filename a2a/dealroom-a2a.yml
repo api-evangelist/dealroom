@@ -1,0 +1,51 @@
+generated: '2026-10-14'
+method: probed
+generator: harvest-agent-card.py
+source: https://dealroomco-prod.main-kill-isr.mintlify.me/.well-known/agent-card.json
+card:
+  file: a2a/dealroom-agent-card.json
+  name: Dealroom API
+  version: 1.0.0
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: dealroomco-prod.main-kill-isr.mintlify.me
+x-evidence:
+  fetched: '2026-10-14'
+  url: https://dealroomco-prod.main-kill-isr.mintlify.me/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  body_bytes: 751
+  body_parses_as: json object
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: '0.3'
+  transport: HTTP+JSON
+  card_shape: 0.3 (top-level protocolVersion)
+  hard_checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+  optional_fields:
+    transport_declared: true
+    defaultInputModes: true
+    defaultOutputModes: true
+  deviations: &id001 []
+cards:
+- file: a2a/dealroom-agent-card.json
+  primary: true
+  host: dealroomco-prod.main-kill-isr.mintlify.me
+  url: https://dealroomco-prod.main-kill-isr.mintlify.me/.well-known/agent-card.json
+  http_status: 200
+  name: Dealroom API
+  grade: conformant
+  deviations: *id001
+- file: a2a/dealroom-developers-agent-card.json
+  primary: false
+  host: developers.dealroom.co
+  url: https://developers.dealroom.co/.well-known/agent-card.json
+  http_status: 200
+  name: Dealroom API
+  grade: conformant
+  deviations: []

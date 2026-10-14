@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/dealroom/main/json-schema/dealroom-entity-funds-response-schema.json",
+  "title": "EntityFundsResponse",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityFundsResponse",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EntityFundItem"
+      }
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "limit": {
+          "type": "number"
+        },
+        "offset": {
+          "type": "number"
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Opaque cursor for the next page. Null when no further pages exist."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Opaque cursor for the previous page. Null when on the first page."
+        }
+      },
+      "required": [
+        "total",
+        "limit",
+        "offset",
+        "next_cursor",
+        "prev_cursor"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "description": "Requested response currency (default USD) — the currency `amount` is expressed in. The original native value is in `amount_source`."
+    }
+  },
+  "required": [
+    "data",
+    "page",
+    "currency"
+  ],
+  "$defs": {
+    "EntityFundAmountSource": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Fund size as stored, in the fund's own native currency."
+        },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ISO 4217 code of the fund's native currency."
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "description": "The original as-stored fund size and its native currency, before conversion."
+    },
+    "EntityFundItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "description": "Stable Dealroom fund id (source `bobjects_funds.id`)."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fund_type": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Fund category — one of `Venture Capital`, `Private Equity`, `Growth Equity`, `Corporate`, `Life Sciences`, `Renewables`, `Fund of Funds`, `Other`."
+        },
+        "amount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Fund size in the requested response `currency` (the top-level envelope `currency`, default USD), converted from the native amount. Null when the source amount is unknown or its native currency has no exchange rate."
+        },
+        "amount_source": {
+          "$ref": "#/$defs/EntityFundAmountSource"
+        },
+        "announced_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date",
+          "description": "Day the fund was announced."
+        },
+        "is_closed": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Whether the fund is closed to new commitments."
+        },
+        "source_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "External news / press URL announcing the fund."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "fund_type",
+        "amount",
+        "amount_source",
+        "announced_date",
+        "is_closed",
+        "source_url"
+      ]
+    }
+  }
+}

@@ -1,0 +1,30 @@
+generated: '2026-10-14'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://developers.dealroom.co/concepts/filtering.md
+sources:
+- https://developers.dealroom.co/concepts/filtering.md
+- https://developers.dealroom.co/concepts/pagination.md
+- https://developers.dealroom.co/references/filters-and-sorting.md
+- https://developers.dealroom.co/getting-started/quickstart.md
+idempotency:
+  coverage: none
+pagination:
+  style: cursor
+  params:
+  - cursor
+  - limit
+  - include_total
+  - view
+  response_fields:
+  - page.limit
+  - page.offset
+  - page.next_cursor
+  - page.prev_cursor
+  - page.total
+  - page.capped
+  - page.tier
+  - page.ecosystem
+  docs: https://developers.dealroom.co/concepts/pagination.md
+authentication: Bearer token in Authorization header plus X-Client-Id header
+docs: https://developers.dealroom.co/concepts/filtering.md

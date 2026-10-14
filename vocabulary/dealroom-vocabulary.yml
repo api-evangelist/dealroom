@@ -1,0 +1,430 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/_original/dealroom-api-openapi.yml
+vocabulary:
+  name: Dealroom Domain Vocabulary
+  description: 'Terms declared by Dealroom''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-14'
+  terms:
+  - term: Discovery
+    definition: API root discovery and functional namespaces.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Entities
+    definition: Companies, investors, people, universities, and other organisations. Filter, sort, and paginate the unified entity index. The
+      term `investor` refers to the investment firm; `fund` refers to the capital vehicle it raises.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Companies
+    definition: Company profiles — the `organization_subtype = company` subset of entities (excludes investors, universities, and gov/NGOs). Same
+      response shape as the entity index, scoped to companies.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Universities
+    definition: University profiles — the `organization_subtype = university` subset of entities. The `university` sub-object carries alumni metrics.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Government & NGO
+    definition: Government bodies and NGOs — the `organization_subtype = gov_ngo` subset of entities.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Transactions
+    definition: Funding rounds, equity events, debt, grants, exits, and other company-level financial events.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Valuations
+    definition: Company valuation history, by `valued_date`.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Investors
+    definition: Investor profiles (VCs, corporates, angels, family offices, governments). Subset of entities where `is_investor = true`. An investor
+      is the firm that makes investments; the capital vehicles it raises are funds available via `/investors/{id}/funds`.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Funds
+    definition: Funds — the capital vehicles investor firms raise (e.g. "Fund III", $200M, 2024). Browse/filter by manager, type, size, and vintage;
+      each fund links to its manager (GP). Fund size (`amount`) converts to the requested `?currency=` (default USD); `amount_source` carries
+      the original native-currency amount.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: People
+    definition: Person profiles (founders, executives, angels, and others). Subset of entities where `entity_type = 'person'`. Same response shape
+      as founders, with company associations, education, and tags.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Founders
+    definition: Founder profiles with company associations and education history. Subset of entities where `is_founder = true`.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: News
+    definition: Curated news articles about companies, funds, deals, sectors, and events.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Jobs
+    definition: Active job openings posted by companies, with hiring-trend signals.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Aggregate
+    definition: Composable single- and multi-metric aggregations across companies, universities, government bodies and NGOs, funding rounds, valuations,
+      founders, investors, and entities of every type.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Timeseries
+    definition: Yearly entity metrics (employees, revenue, valuation).
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Filters
+    definition: Filter registry discovery and value lookup. Use `/reference/filters` to discover available filters per scope and `/reference/filters/:key/values`
+      to look up valid values.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Health
+    definition: Liveness probe (public, unauthenticated).
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: Search
+    definition: Cross-resource fuzzy search across companies, investors, people, universities, and government & NGO bodies.
+    tags:
+    - Resource Group
+    source: openapi/_original/dealroom-api-openapi.yml
+  - term: PartialDate
+    definition: 'A date at the precision the source knows it. The value''s length is its precision: `YYYY` when only the year is known, `YYYY-MM`
+      for the month, `YYYY-MM-DD` for the day. Never padded: an unknown month or day shortens the value rather than defaulting to `01`. Deliberately
+      not `format: date`, which requires a full day.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/PartialDate
+  - term: HealthResponse
+    definition: 'Object declared by the contract with fields: status, timestamp, database.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/HealthResponse
+  - term: DiscoveryResponse
+    definition: 'Object declared by the contract with fields: version, groups, docs, openapi.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/DiscoveryResponse
+  - term: NamespaceDiscoveryResponse
+    definition: 'Object declared by the contract with fields: version, namespace, description, resources, docs, openapi.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/NamespaceDiscoveryResponse
+  - term: EntityListResponse
+    definition: 'Entities: full rows by default, summary rows with `view=summary`.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityListResponse
+  - term: Entities — full rows
+    definition: 'Object declared by the contract with fields: view, data, page, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityListResponseFull
+  - term: Person
+    definition: 'Object declared by the contract with fields: uuid, type, subtype, name, tagline, about, image, dealroom_url, links, locations,
+      roles, classifications. (10 more)'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityPerson
+  - term: LocationRole
+    definition: '`hq`, `founding` or `office`. An entity has at most one `hq` and one `founding` location, and any number of offices.'
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/LocationRole
+  - term: EntityRole
+    definition: 'A role the entity plays: person roles (founder, executive, partner, investor) and organization roles (investor, limited_partner,
+      fund_manager).'
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityRole
+  - term: Classification
+    definition: A Dealroom label. New values are added without a version change, so a client must tolerate a value it does not recognise.
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/Classification
+  - term: TagType
+    definition: Category of a tag (e.g. industry, sector, technology).
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/TagType
+  - term: Gender
+    definition: Gender of a person.
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/Gender
+  - term: EntityRef
+    definition: 'The identity of an entity embedded in another entity''s response. Closed: richer detail lives on the sub-resource, where tier
+      redaction can reach it.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityRef
+  - term: EntityType
+    definition: 'Top-level entity type: `organization` or `person`.'
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityType
+  - term: OrganizationSubtype
+    definition: 'The kind of organization: company, university, gov_ngo or investor.'
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/OrganizationSubtype
+  - term: PersonFullBlock
+    definition: A full-only block of a person row, as `available[]` lists it.
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/PersonFullBlock
+  - term: Company
+    definition: 'Object declared by the contract with fields: uuid, type, domain, name, tagline, about, image, dealroom_url, links, locations,
+      roles, taxonomy. (23 more)'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityCompany
+  - term: CompanyStatus
+    definition: Operational status of a company.
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CompanyStatus
+  - term: FounderRef
+    definition: An `EntityRef` plus the founder labels the founders glance is ordered by.
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/FounderRef
+  - term: PersonClassification
+    definition: 'A Dealroom founder label: the person-applicable subset of `Classification`.'
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/PersonClassification
+  - term: CompanyFullBlock
+    definition: A full-only block of a company row, as `available[]` lists it.
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CompanyFullBlock
+  - term: University
+    definition: 'Object declared by the contract with fields: uuid, type, domain, name, tagline, about, image, dealroom_url, links, locations,
+      roles, taxonomy. (11 more)'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityUniversity
+  - term: UniversityFullBlock
+    definition: A full-only block of a university row, as `available[]` lists it.
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/UniversityFullBlock
+  - term: Government & NGO
+    definition: 'Object declared by the contract with fields: uuid, type, domain, name, tagline, about, image, dealroom_url, links, locations,
+      roles, taxonomy. (15 more)'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityGovNgo
+  - term: GovNgoFullBlock
+    definition: A full-only block of a gov/NGO row, as `available[]` lists it.
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/GovNgoFullBlock
+  - term: Investor firm
+    definition: 'Object declared by the contract with fields: uuid, type, domain, name, tagline, about, image, dealroom_url, links, locations,
+      roles, taxonomy. (17 more)'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityInvestor
+  - term: InvestorFullBlock
+    definition: A full-only block of an investor row, as `available[]` lists it.
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/InvestorFullBlock
+  - term: CappedPaginationPage
+    definition: 'Object declared by the contract with fields: total, limit, offset, next_cursor, prev_cursor, capped, tier, ecosystem.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CappedPaginationPage
+  - term: AccessTier
+    definition: 'The access tier applied to this request (anonymous, free, premium). API-key callers report premium: they receive the full field
+      set and are not page-capped.'
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/AccessTier
+  - term: Entities — summary rows
+    definition: 'Object declared by the contract with fields: view, data, page, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityListResponseSummary
+  - term: EntitySummary
+    definition: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntitySummary
+  - term: Person
+    definition: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/PersonSummary
+  - term: Organization
+    definition: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/OrganizationSummary
+  - term: Company
+    definition: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CompanySummary
+  - term: University
+    definition: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/UniversitySummary
+  - term: Government & NGO
+    definition: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/GovNgoSummary
+  - term: Investor firm
+    definition: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/InvestorSummary
+  - term: ErrorResponse
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/ErrorResponse
+  - term: GeoPointListResponse
+    definition: 'Object declared by the contract with fields: data, page.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/GeoPointListResponse
+  - term: GeoPoint
+    definition: 'Object declared by the contract with fields: uuid, name, lat, lon, hq_country, hq_city.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/GeoPoint
+  - term: EntityDetailResponse
+    definition: 'Object declared by the contract with fields: data, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityDetailResponse
+  - term: EntityLpFundsResponse
+    definition: 'Object declared by the contract with fields: data, page, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityLpFundsResponse
+  - term: EntityLpFundItem
+    definition: 'Object declared by the contract with fields: investor.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityLpFundItem
+  - term: CompanyListResponse
+    definition: 'Companies: full rows by default, summary rows with `view=summary`.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CompanyListResponse
+  - term: Companies — full rows
+    definition: 'Object declared by the contract with fields: view, data, page, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CompanyListResponseFull
+  - term: Company
+    definition: 'Object declared by the contract with fields: uuid, type, domain, name, tagline, about, image, dealroom_url, links, locations,
+      roles, taxonomy. (23 more)'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/Company
+  - term: Companies — summary rows
+    definition: 'Object declared by the contract with fields: view, data, page, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CompanyListResponseSummary
+  - term: CompanyGeoResponse
+    definition: 'Object declared by the contract with fields: data, page.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CompanyGeoResponse
+  - term: CompanyGeoPoint
+    definition: 'Object declared by the contract with fields: id, name, lat, lon, logo, value.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CompanyGeoPoint
+  - term: CompanyDetailResponse
+    definition: 'Object declared by the contract with fields: data, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/CompanyDetailResponse
+  - term: EntityTransactionsResponse
+    definition: 'Object declared by the contract with fields: data, page, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityTransactionsResponse
+  - term: EntityTransactionItem
+    definition: 'Object declared by the contract with fields: id, amount, announced_date, round_type, standardized_round, valuation, is_verified,
+      is_vc_round, is_exit, investors, source_url.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityTransactionItem
+  - term: StandardizedRound
+    definition: Normalised round stage, the value the `standardized_round` filter matches.
+    tags:
+    - Enumeration
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/StandardizedRound
+  - term: EntityValuationsResponse
+    definition: 'Object declared by the contract with fields: data, page, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityValuationsResponse
+  - term: EntityValuationItem
+    definition: 'Object declared by the contract with fields: id, value, valued_date, is_estimate.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityValuationItem
+  - term: EntityInvestorsResponse
+    definition: 'Object declared by the contract with fields: data, page, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityInvestorsResponse
+  - term: EntityInvestorItem
+    definition: 'Object declared by the contract with fields: is_lead, rounds_count, last_round_date, investor.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityInvestorItem
+  - term: EntityFinancialsResponse
+    definition: 'Object declared by the contract with fields: data, currency.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityFinancialsResponse
+  - term: FinancialYear
+    definition: 'Object declared by the contract with fields: year, revenue, ebitda, profit, rnd, valuation, employees.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/FinancialYear
+  - term: EntityWebTrafficResponse
+    definition: 'Object declared by the contract with fields: data.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityWebTrafficResponse
+  - term: WebTrafficPoint
+    definition: 'Object declared by the contract with fields: year, month, visits.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/WebTrafficPoint
+  - term: EntityHeadcountBreakdownResponse
+    definition: 'Object declared by the contract with fields: data.'
+    tags:
+    - Object
+    source: openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityHeadcountBreakdownResponse

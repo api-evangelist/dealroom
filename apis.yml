@@ -1,23 +1,130 @@
 aid: dealroom
 name: Dealroom
-description: 'Dealroom is a company surfaced via the API Evangelist harvest backlog (source: tag-qc) and
-  added to the network as a stub for full-pipeline profiling.'
+description: 'Dealroom is a company surfaced via the API Evangelist harvest backlog (source: tag-qc) and added to the network as a stub for full-pipeline
+  profiling.'
 url: https://raw.githubusercontent.com/api-evangelist/dealroom/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:tag-qc
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-10-14 (modular-v1; was harvest)
 specificationVersion: '0.20'
 created: '2026-10-14'
 modified: '2026-10-14'
 tags:
 - Company
-apis: []
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Spectral
+  url: rules/dealroom-rules.yml
+- type: JSONLD
+  url: json-ld/dealroom-context.jsonld
+- type: Vocabulary
+  url: vocabulary/dealroom-vocabulary.yml
+- type: Conformance
+  url: conformance/dealroom-conformance.yml
+- type: RateLimits
+  url: rate-limits/dealroom-rate-limits.yml
+- type: DataModel
+  url: data-model/dealroom-data-model.yml
+- type: ChangeLog
+  url: changelog/dealroom-changelog.yml
+- type: Conventions
+  url: conventions/dealroom-conventions.yml
+- type: Security
+  url: https://dealroom.co/privacy-policy
+- type: Authentication
+  url: authentication/dealroom-authentication.yml
+- type: Deprecation
+  url: https://developers.dealroom.co/concepts/versioning.md#response-headers
+- type: Lifecycle
+  url: lifecycle/dealroom-lifecycle.yml
+- type: ErrorCatalog
+  url: errors/dealroom-problem-types.yml
+- type: LLMsTxt
+  url: llms/dealroom-llms.txt
+- type: AgentCard
+  url: a2a/dealroom-a2a.yml
+- type: MCPServer
+  url: mcp/dealroom-mcp.yml
+- type: SecurityTxt
+  url: well-known/dealroom-security.txt
+- type: SecurityTxt
+  url: well-known/dealroom-docs-security.txt
+- type: SecurityTxt
+  url: well-known/dealroom-api-security.txt
+- type: WellKnown
+  url: well-known/dealroom-well-known.yml
+- type: Hosts
+  url: hosts/dealroom-hosts.yml
+- type: Vendors
+  url: vendors/dealroom-vendors.yml
+- type: GettingStarted
+  url: https://developers.dealroom.co/getting-started/quickstart
+- type: Documentation
+  url: https://developers.dealroom.co/
+- type: DeveloperPortal
+  url: https://api.dealroom.app/data/entities?sort=-launch_date&limit=1
+- type: APIReference
+  url: https://developers.dealroom.co/llms.txt
+- type: GitHubOrganization
+  url: https://github.com/dealroom
+- type: VulnerabilityDisclosure
+  url: security/dealroom-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/dealroom-domain-security.yml
 - type: Website
   url: https://dealroom.co
+apis:
+- name: Dealroom API
+  description: REST API for Dealroom data
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  aid: dealroom:dealroom-api
+- aid: dealroom:dealroom-api-api
+  name: Dealroom API API
+  description: 'REST API for the Dealroom platform — companies, funds, founders, investors, funding rounds, valuations, taxonomy, news, and aggregate
+
+    analytics across all of them. Authentication uses Auth0 (Bearer JWT or OAuth2 client_credentials). All endpoints are versioned via the `API-Version`
+
+    header (Stripe-st'
+  humanURL: https://developers.dealroom.co/llms.txt
+  baseURL: https://api.dealroom.app
+  properties:
+  - type: OpenAPI
+    url: openapi/_original/dealroom-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+x-coverage:
+  state: blocked
+  reason: bot-challenge
+  method: derived
+  generated: '2026-10-14'
+  generator: derive-coverage.py (pre-flight evidence)
+  detail: the company's own front door answers a browser with an anti-bot challenge, so nothing behind it is reachable by any reader
+  evidence:
+  - url: https://developers.dealroom.co/openapi.yaml
+    status: null
+  - url: https://developers.dealroom.co/mcp
+    status: null
+  - url: https://dealroom.co
+    status: 403
+x-enrichment:
+  date: '2026-10-14'
+  status: enriched
+  artifacts_added: 30
+  pass: modular-v1
+  engine: identity=local,contract=local,surfaces=local,docs=local,regulatory=local

@@ -1,0 +1,2353 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/dealroom/main/json-schema/dealroom-entity-investments-response-schema.json",
+  "title": "EntityInvestmentsResponse",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/dealroom-api-openapi.yml#/components/schemas/EntityInvestmentsResponse",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EntityInvestmentItem"
+      }
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "limit": {
+          "type": "number"
+        },
+        "offset": {
+          "type": "number"
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Opaque cursor for the next page. Null when no further pages exist."
+        },
+        "prev_cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Opaque cursor for the previous page. Null when on the first page."
+        }
+      },
+      "required": [
+        "total",
+        "limit",
+        "offset",
+        "next_cursor",
+        "prev_cursor"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "description": "Currency the portfolio-company monetary fields are expressed in (default USD)."
+    }
+  },
+  "required": [
+    "data",
+    "page",
+    "currency"
+  ],
+  "$defs": {
+    "Classification": {
+      "type": "string",
+      "enum": [
+        "startup",
+        "colt",
+        "titan",
+        "rising_star",
+        "spinout",
+        "thoroughbred",
+        "unicorn",
+        "vc_backed",
+        "funded",
+        "exited",
+        "pe_owned",
+        "serial_founder",
+        "super_founder",
+        "promising_founder",
+        "strong_founder"
+      ],
+      "description": "A Dealroom label. New values are added without a version change, so a client must tolerate a value it does not recognise."
+    },
+    "CompanyStatus": {
+      "type": "string",
+      "enum": [
+        "operational",
+        "acquired",
+        "closed",
+        "low_activity"
+      ],
+      "description": "Operational status of a company."
+    },
+    "CompanySummary": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "Stable UUID of the entity; the sole public identifier."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "organization"
+          ],
+          "description": "Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`."
+        },
+        "domain": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Registrable domain, e.g. \"stripe.com\"."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "tagline": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "One-line description."
+        },
+        "about": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Long-form description."
+        },
+        "image": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Absolute logo URL."
+        },
+        "dealroom_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical profile URL on app.dealroom.co."
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "website": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Website URL."
+            },
+            "linkedin": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "LinkedIn profile URL."
+            },
+            "twitter": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Twitter / X profile URL."
+            },
+            "instagram": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Instagram URL or handle."
+            },
+            "angellist": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "AngelList URL or handle."
+            },
+            "crunchbase": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Crunchbase profile URL."
+            }
+          },
+          "required": [
+            "website",
+            "linkedin",
+            "twitter",
+            "instagram",
+            "angellist",
+            "crunchbase"
+          ],
+          "description": "The entity's own presence on the web; each null when unknown."
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "$ref": "#/$defs/LocationRole"
+              },
+              "city": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "City; null when not known."
+              },
+              "state": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "State or region; null when none."
+              },
+              "country": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "Country."
+              },
+              "continent": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "Continent."
+              },
+              "lat": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Entity coordinates when known, otherwise the city centroid."
+              },
+              "lon": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Entity coordinates when known, otherwise the city centroid."
+              }
+            },
+            "required": [
+              "role",
+              "city",
+              "state",
+              "country",
+              "continent",
+              "lat",
+              "lon"
+            ]
+          },
+          "description": "Every location: hq, founding, then offices; empty when none."
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EntityRole"
+          },
+          "description": "Roles the organization plays: `investor`, `limited_partner`, `fund_manager`."
+        },
+        "taxonomy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "Numeric identifier of the tag."
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name of the tag."
+              },
+              "type": {
+                "$ref": "#/$defs/TagType"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "type"
+            ]
+          },
+          "description": "Taxonomy terms (industries, sectors, technologies, …); empty when none."
+        },
+        "launch_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the organization was founded, at source precision."
+        },
+        "closing_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the organization closed; null while active."
+        },
+        "employees_count": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of employees."
+        },
+        "added_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "When the organization was added to Dealroom (RFC 3339)."
+        },
+        "updated_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "When the record was last modified (RFC 3339)."
+        },
+        "subtype": {
+          "type": "string",
+          "enum": [
+            "company"
+          ],
+          "description": "Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons."
+        },
+        "classifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Classification"
+          },
+          "description": "Dealroom labels; empty when none."
+        },
+        "employee_count_1y_growth": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Year-over-year employee growth, %."
+        },
+        "status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CompanyStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Operational status."
+        },
+        "signal_rating": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Dealroom Signal rating (0-100)."
+        },
+        "unicorn_type": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Unicorn tier, e.g. \"unicorn\", \"decacorn\"."
+        },
+        "became_unicorn_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the company reached a $1B valuation."
+        },
+        "became_thoroughbred_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the company was verified as a Thoroughbred."
+        },
+        "exit_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the company exited (IPO or acquisition)."
+        },
+        "investor": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Tag id."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name."
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Machine-readable code."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "code"
+                ]
+              },
+              "description": "Investor types; empty when none."
+            },
+            "stages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Tag id."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name."
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Machine-readable code."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "code"
+                ]
+              },
+              "description": "Stages invested in; empty when none."
+            },
+            "deal_size": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "min": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Smallest ticket, active currency."
+                },
+                "max": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Largest ticket, active currency."
+                }
+              },
+              "required": [
+                "min",
+                "max"
+              ],
+              "description": "Ticket size range; null when unknown."
+            },
+            "investments": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Investments made."
+                },
+                "total_invested": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency."
+                },
+                "preferred_round": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Most frequent round stage, e.g. `series_a`."
+                },
+                "last_round_date": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/PartialDate"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Date of the most recent investment round, at source precision."
+                }
+              },
+              "required": [
+                "count",
+                "total_invested",
+                "preferred_round",
+                "last_round_date"
+              ],
+              "description": "Investment activity."
+            }
+          },
+          "required": [
+            "types",
+            "stages",
+            "deal_size",
+            "investments"
+          ],
+          "description": "The organization's investing profile; null unless it invests."
+        },
+        "funding": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "total": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Total raised, active currency."
+            },
+            "total_vc": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "VC-only share of `total`."
+            },
+            "rounds_count": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Funding rounds recorded."
+            }
+          },
+          "required": [
+            "total",
+            "total_vc",
+            "rounds_count"
+          ],
+          "description": "Funding raised; null when no round is recorded."
+        },
+        "valuation": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Latest valuation, active currency."
+            },
+            "year": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Year the valuation was recorded."
+            },
+            "month": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Month (1-12); null when unknown."
+            }
+          },
+          "required": [
+            "value",
+            "year",
+            "month"
+          ],
+          "description": "Most recent valuation, with the period it applies to."
+        },
+        "jobs": {
+          "type": "object",
+          "properties": {
+            "is_hiring": {
+              "type": [
+                "boolean",
+                "null"
+              ],
+              "description": "Currently recruiting."
+            },
+            "open_count": {
+              "type": "number",
+              "description": "Active job openings; 0 when none."
+            }
+          },
+          "required": [
+            "is_hiring",
+            "open_count"
+          ],
+          "description": "Hiring status and open roles."
+        }
+      },
+      "required": [
+        "uuid",
+        "type",
+        "domain",
+        "name",
+        "tagline",
+        "about",
+        "image",
+        "dealroom_url",
+        "links",
+        "locations",
+        "roles",
+        "taxonomy",
+        "launch_date",
+        "closing_date",
+        "employees_count",
+        "added_at",
+        "updated_at",
+        "subtype",
+        "classifications",
+        "employee_count_1y_growth",
+        "status",
+        "signal_rating",
+        "unicorn_type",
+        "became_unicorn_date",
+        "became_thoroughbred_date",
+        "exit_date",
+        "investor",
+        "funding",
+        "valuation",
+        "jobs"
+      ],
+      "title": "Company",
+      "description": "An entity as it appears on another row: its type's row without the full-only blocks."
+    },
+    "EntityInvestmentItem": {
+      "type": "object",
+      "properties": {
+        "is_lead": {
+          "type": "boolean",
+          "description": "Led at least one of these rounds."
+        },
+        "rounds_count": {
+          "type": "integer",
+          "description": "Rounds taken part in."
+        },
+        "last_round_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Date of the most recent of those rounds, at source precision."
+        },
+        "company": {
+          "$ref": "#/$defs/OrganizationSummary"
+        }
+      },
+      "required": [
+        "is_lead",
+        "rounds_count",
+        "last_round_date",
+        "company"
+      ]
+    },
+    "EntityRole": {
+      "type": "string",
+      "enum": [
+        "founder",
+        "executive",
+        "partner",
+        "investor",
+        "limited_partner",
+        "fund_manager"
+      ],
+      "description": "A role the entity plays: person roles (founder, executive, partner, investor) and organization roles (investor, limited_partner, fund_manager)."
+    },
+    "GovNgoSummary": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "Stable UUID of the entity; the sole public identifier."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "organization"
+          ],
+          "description": "Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`."
+        },
+        "domain": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Registrable domain, e.g. \"stripe.com\"."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "tagline": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "One-line description."
+        },
+        "about": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Long-form description."
+        },
+        "image": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Absolute logo URL."
+        },
+        "dealroom_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical profile URL on app.dealroom.co."
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "website": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Website URL."
+            },
+            "linkedin": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "LinkedIn profile URL."
+            },
+            "twitter": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Twitter / X profile URL."
+            },
+            "instagram": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Instagram URL or handle."
+            },
+            "angellist": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "AngelList URL or handle."
+            },
+            "crunchbase": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Crunchbase profile URL."
+            }
+          },
+          "required": [
+            "website",
+            "linkedin",
+            "twitter",
+            "instagram",
+            "angellist",
+            "crunchbase"
+          ],
+          "description": "The entity's own presence on the web; each null when unknown."
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "$ref": "#/$defs/LocationRole"
+              },
+              "city": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "City; null when not known."
+              },
+              "state": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "State or region; null when none."
+              },
+              "country": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "Country."
+              },
+              "continent": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "Continent."
+              },
+              "lat": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Entity coordinates when known, otherwise the city centroid."
+              },
+              "lon": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Entity coordinates when known, otherwise the city centroid."
+              }
+            },
+            "required": [
+              "role",
+              "city",
+              "state",
+              "country",
+              "continent",
+              "lat",
+              "lon"
+            ]
+          },
+          "description": "Every location: hq, founding, then offices; empty when none."
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EntityRole"
+          },
+          "description": "Roles the organization plays: `investor`, `limited_partner`, `fund_manager`."
+        },
+        "taxonomy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "Numeric identifier of the tag."
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name of the tag."
+              },
+              "type": {
+                "$ref": "#/$defs/TagType"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "type"
+            ]
+          },
+          "description": "Taxonomy terms (industries, sectors, technologies, …); empty when none."
+        },
+        "launch_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the organization was founded, at source precision."
+        },
+        "closing_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the organization closed; null while active."
+        },
+        "employees_count": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of employees."
+        },
+        "added_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "When the organization was added to Dealroom (RFC 3339)."
+        },
+        "updated_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "When the record was last modified (RFC 3339)."
+        },
+        "subtype": {
+          "type": "string",
+          "enum": [
+            "gov_ngo"
+          ],
+          "description": "Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons."
+        },
+        "classifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Classification"
+          },
+          "description": "Dealroom labels; empty when none."
+        },
+        "signal_rating": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Dealroom Signal rating (0-100)."
+        },
+        "investor": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Tag id."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name."
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Machine-readable code."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "code"
+                ]
+              },
+              "description": "Investor types; empty when none."
+            },
+            "stages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Tag id."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name."
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Machine-readable code."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "code"
+                ]
+              },
+              "description": "Stages invested in; empty when none."
+            },
+            "deal_size": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "min": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Smallest ticket, active currency."
+                },
+                "max": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Largest ticket, active currency."
+                }
+              },
+              "required": [
+                "min",
+                "max"
+              ],
+              "description": "Ticket size range; null when unknown."
+            },
+            "investments": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Investments made."
+                },
+                "total_invested": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency."
+                },
+                "preferred_round": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Most frequent round stage, e.g. `series_a`."
+                },
+                "last_round_date": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/PartialDate"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Date of the most recent investment round, at source precision."
+                }
+              },
+              "required": [
+                "count",
+                "total_invested",
+                "preferred_round",
+                "last_round_date"
+              ],
+              "description": "Investment activity."
+            }
+          },
+          "required": [
+            "types",
+            "stages",
+            "deal_size",
+            "investments"
+          ],
+          "description": "The organization's investing profile; null unless it invests."
+        },
+        "funding": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "total": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Total raised, active currency."
+            },
+            "total_vc": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "VC-only share of `total`."
+            },
+            "rounds_count": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Funding rounds recorded."
+            }
+          },
+          "required": [
+            "total",
+            "total_vc",
+            "rounds_count"
+          ],
+          "description": "Funding raised; null when no round is recorded."
+        },
+        "jobs": {
+          "type": "object",
+          "properties": {
+            "is_hiring": {
+              "type": [
+                "boolean",
+                "null"
+              ],
+              "description": "Currently recruiting."
+            },
+            "open_count": {
+              "type": "number",
+              "description": "Active job openings; 0 when none."
+            }
+          },
+          "required": [
+            "is_hiring",
+            "open_count"
+          ],
+          "description": "Hiring status and open roles."
+        }
+      },
+      "required": [
+        "uuid",
+        "type",
+        "domain",
+        "name",
+        "tagline",
+        "about",
+        "image",
+        "dealroom_url",
+        "links",
+        "locations",
+        "roles",
+        "taxonomy",
+        "launch_date",
+        "closing_date",
+        "employees_count",
+        "added_at",
+        "updated_at",
+        "subtype",
+        "classifications",
+        "signal_rating",
+        "investor",
+        "funding",
+        "jobs"
+      ],
+      "title": "Government & NGO",
+      "description": "An entity as it appears on another row: its type's row without the full-only blocks."
+    },
+    "InvestorSummary": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "Stable UUID of the entity; the sole public identifier."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "organization"
+          ],
+          "description": "Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`."
+        },
+        "domain": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Registrable domain, e.g. \"stripe.com\"."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "tagline": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "One-line description."
+        },
+        "about": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Long-form description."
+        },
+        "image": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Absolute logo URL."
+        },
+        "dealroom_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical profile URL on app.dealroom.co."
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "website": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Website URL."
+            },
+            "linkedin": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "LinkedIn profile URL."
+            },
+            "twitter": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Twitter / X profile URL."
+            },
+            "instagram": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Instagram URL or handle."
+            },
+            "angellist": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "AngelList URL or handle."
+            },
+            "crunchbase": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Crunchbase profile URL."
+            }
+          },
+          "required": [
+            "website",
+            "linkedin",
+            "twitter",
+            "instagram",
+            "angellist",
+            "crunchbase"
+          ],
+          "description": "The entity's own presence on the web; each null when unknown."
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "$ref": "#/$defs/LocationRole"
+              },
+              "city": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "City; null when not known."
+              },
+              "state": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "State or region; null when none."
+              },
+              "country": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "Country."
+              },
+              "continent": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "Continent."
+              },
+              "lat": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Entity coordinates when known, otherwise the city centroid."
+              },
+              "lon": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Entity coordinates when known, otherwise the city centroid."
+              }
+            },
+            "required": [
+              "role",
+              "city",
+              "state",
+              "country",
+              "continent",
+              "lat",
+              "lon"
+            ]
+          },
+          "description": "Every location: hq, founding, then offices; empty when none."
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EntityRole"
+          },
+          "description": "Roles the organization plays: `investor`, `limited_partner`, `fund_manager`."
+        },
+        "taxonomy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "Numeric identifier of the tag."
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name of the tag."
+              },
+              "type": {
+                "$ref": "#/$defs/TagType"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "type"
+            ]
+          },
+          "description": "Taxonomy terms (industries, sectors, technologies, …); empty when none."
+        },
+        "launch_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the organization was founded, at source precision."
+        },
+        "closing_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the organization closed; null while active."
+        },
+        "employees_count": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of employees."
+        },
+        "added_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "When the organization was added to Dealroom (RFC 3339)."
+        },
+        "updated_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "When the record was last modified (RFC 3339)."
+        },
+        "subtype": {
+          "type": "string",
+          "enum": [
+            "investor"
+          ],
+          "description": "Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons."
+        },
+        "signal_rating": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Dealroom Signal rating (0-100)."
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "Tag id."
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name."
+              },
+              "code": {
+                "type": "string",
+                "description": "Machine-readable code."
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "code"
+            ]
+          },
+          "description": "Investor types; empty when none."
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "Tag id."
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name."
+              },
+              "code": {
+                "type": "string",
+                "description": "Machine-readable code."
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "code"
+            ]
+          },
+          "description": "Stages invested in; empty when none."
+        },
+        "deal_size": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "min": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Smallest ticket, active currency."
+            },
+            "max": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Largest ticket, active currency."
+            }
+          },
+          "required": [
+            "min",
+            "max"
+          ],
+          "description": "Ticket size range; null when unknown."
+        },
+        "investments": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Investments made."
+            },
+            "total_invested": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency."
+            },
+            "preferred_round": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Most frequent round stage, e.g. `series_a`."
+            },
+            "last_round_date": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/PartialDate"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Date of the most recent investment round, at source precision."
+            }
+          },
+          "required": [
+            "count",
+            "total_invested",
+            "preferred_round",
+            "last_round_date"
+          ],
+          "description": "Investment activity."
+        },
+        "investor": {
+          "type": "null",
+          "description": "Always null: an investor's profile is flat at the root."
+        }
+      },
+      "required": [
+        "uuid",
+        "type",
+        "domain",
+        "name",
+        "tagline",
+        "about",
+        "image",
+        "dealroom_url",
+        "links",
+        "locations",
+        "roles",
+        "taxonomy",
+        "launch_date",
+        "closing_date",
+        "employees_count",
+        "added_at",
+        "updated_at",
+        "subtype",
+        "signal_rating",
+        "types",
+        "stages",
+        "deal_size",
+        "investments",
+        "investor"
+      ],
+      "title": "Investor firm",
+      "description": "An entity as it appears on another row: its type's row without the full-only blocks."
+    },
+    "LocationRole": {
+      "type": "string",
+      "enum": [
+        "hq",
+        "founding",
+        "office"
+      ],
+      "description": "`hq`, `founding` or `office`. An entity has at most one `hq` and one `founding` location, and any number of offices."
+    },
+    "OrganizationSummary": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/CompanySummary"
+        },
+        {
+          "$ref": "#/$defs/UniversitySummary"
+        },
+        {
+          "$ref": "#/$defs/GovNgoSummary"
+        },
+        {
+          "$ref": "#/$defs/InvestorSummary"
+        }
+      ],
+      "title": "Organization",
+      "description": "An entity as it appears on another row: its type's row without the full-only blocks.",
+      "type": "object"
+    },
+    "PartialDate": {
+      "type": "string",
+      "pattern": "^\\d{4}(-\\d{2}(-\\d{2})?)?$",
+      "description": "A date at the precision the source knows it. The value's length is its precision: `YYYY` when only the year is known, `YYYY-MM` for the month, `YYYY-MM-DD` for the day. Never padded: an unknown month or day shortens the value rather than defaulting to `01`. Deliberately not `format: date`, which requires a full day."
+    },
+    "TagType": {
+      "type": "string",
+      "enum": [
+        "sector",
+        "technology",
+        "industry",
+        "sub_industry",
+        "business_model",
+        "income_stream",
+        "client_focus",
+        "sdg",
+        "ownership",
+        "techstack_category",
+        "deal_structure",
+        "growth_stage",
+        "investor_type",
+        "background"
+      ],
+      "description": "Category of a tag (e.g. industry, sector, technology)."
+    },
+    "UniversitySummary": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "description": "Stable UUID of the entity; the sole public identifier."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "organization"
+          ],
+          "description": "Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`."
+        },
+        "domain": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Registrable domain, e.g. \"stripe.com\"."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "tagline": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "One-line description."
+        },
+        "about": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Long-form description."
+        },
+        "image": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Absolute logo URL."
+        },
+        "dealroom_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical profile URL on app.dealroom.co."
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "website": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Website URL."
+            },
+            "linkedin": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "LinkedIn profile URL."
+            },
+            "twitter": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Twitter / X profile URL."
+            },
+            "instagram": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Instagram URL or handle."
+            },
+            "angellist": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "AngelList URL or handle."
+            },
+            "crunchbase": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Crunchbase profile URL."
+            }
+          },
+          "required": [
+            "website",
+            "linkedin",
+            "twitter",
+            "instagram",
+            "angellist",
+            "crunchbase"
+          ],
+          "description": "The entity's own presence on the web; each null when unknown."
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "$ref": "#/$defs/LocationRole"
+              },
+              "city": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "City; null when not known."
+              },
+              "state": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "State or region; null when none."
+              },
+              "country": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "Country."
+              },
+              "continent": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Location id, as accepted by the location filters."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Location name."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "description": "Continent."
+              },
+              "lat": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Entity coordinates when known, otherwise the city centroid."
+              },
+              "lon": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Entity coordinates when known, otherwise the city centroid."
+              }
+            },
+            "required": [
+              "role",
+              "city",
+              "state",
+              "country",
+              "continent",
+              "lat",
+              "lon"
+            ]
+          },
+          "description": "Every location: hq, founding, then offices; empty when none."
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EntityRole"
+          },
+          "description": "Roles the organization plays: `investor`, `limited_partner`, `fund_manager`."
+        },
+        "taxonomy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "Numeric identifier of the tag."
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name of the tag."
+              },
+              "type": {
+                "$ref": "#/$defs/TagType"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "type"
+            ]
+          },
+          "description": "Taxonomy terms (industries, sectors, technologies, …); empty when none."
+        },
+        "launch_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the organization was founded, at source precision."
+        },
+        "closing_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "When the organization closed; null while active."
+        },
+        "employees_count": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Number of employees."
+        },
+        "added_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "When the organization was added to Dealroom (RFC 3339)."
+        },
+        "updated_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "When the record was last modified (RFC 3339)."
+        },
+        "subtype": {
+          "type": "string",
+          "enum": [
+            "university"
+          ],
+          "description": "Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons."
+        },
+        "spinouts_count": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Spinout companies originating from the university."
+        },
+        "investor": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Tag id."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name."
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Machine-readable code."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "code"
+                ]
+              },
+              "description": "Investor types; empty when none."
+            },
+            "stages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "Tag id."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name."
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Machine-readable code."
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "code"
+                ]
+              },
+              "description": "Stages invested in; empty when none."
+            },
+            "deal_size": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "min": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Smallest ticket, active currency."
+                },
+                "max": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Largest ticket, active currency."
+                }
+              },
+              "required": [
+                "min",
+                "max"
+              ],
+              "description": "Ticket size range; null when unknown."
+            },
+            "investments": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Investments made."
+                },
+                "total_invested": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "description": "Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency."
+                },
+                "preferred_round": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Most frequent round stage, e.g. `series_a`."
+                },
+                "last_round_date": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/PartialDate"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Date of the most recent investment round, at source precision."
+                }
+              },
+              "required": [
+                "count",
+                "total_invested",
+                "preferred_round",
+                "last_round_date"
+              ],
+              "description": "Investment activity."
+            }
+          },
+          "required": [
+            "types",
+            "stages",
+            "deal_size",
+            "investments"
+          ],
+          "description": "The organization's investing profile; null unless it invests."
+        }
+      },
+      "required": [
+        "uuid",
+        "type",
+        "domain",
+        "name",
+        "tagline",
+        "about",
+        "image",
+        "dealroom_url",
+        "links",
+        "locations",
+        "roles",
+        "taxonomy",
+        "launch_date",
+        "closing_date",
+        "employees_count",
+        "added_at",
+        "updated_at",
+        "subtype",
+        "spinouts_count",
+        "investor"
+      ],
+      "title": "University",
+      "description": "An entity as it appears on another row: its type's row without the full-only blocks."
+    }
+  }
+}

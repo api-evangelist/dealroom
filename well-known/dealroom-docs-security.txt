@@ -1,0 +1,8 @@
+Canonical: https://dealroom.co/.well-known/security.txt
+Canonical: https://app.dealroom.co/.well-known/security.txt
+Canonical: https://api.dealroom.co/.well-known/security.txt
+Contact: mailto:security@dealroom.co
+Expires: 2027-08-19T11:00:00Z
+Hiring: https://jobs.dealroom.co/
+Policy: https://dealroom.co/privacy-policy
+Preferred-Languages: en

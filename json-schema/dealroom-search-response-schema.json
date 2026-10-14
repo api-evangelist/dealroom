@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/dealroom/main/json-schema/dealroom-search-response-schema.json",
+  "title": "SearchResponse",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/dealroom-api-openapi.yml#/components/schemas/SearchResponse",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "investor",
+              "person",
+              "company",
+              "university",
+              "gov_ngo"
+            ]
+          },
+          "entity_type": {
+            "type": "string",
+            "enum": [
+              "organization",
+              "person"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "tagline": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "image": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_unicorn": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "investor_rank": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "website_domain": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hq_city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hq_country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "uuid",
+          "type",
+          "entity_type",
+          "name",
+          "tagline",
+          "image",
+          "is_unicorn",
+          "investor_rank",
+          "website_domain",
+          "hq_city",
+          "hq_country"
+        ]
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

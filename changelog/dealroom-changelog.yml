@@ -1,0 +1,59 @@
+generated: '2026-10-14'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://developers.dealroom.co/concepts/versioning.md
+sources:
+- https://developers.dealroom.co/concepts/versioning.md
+- https://developers.dealroom.co/changelog.md
+entries:
+- breaking: false
+  highlights:
+  - '`group_by` on `/analytics/aggregate/{source}` and `/analytics/aggregate/{source}/multi-metric` now accepts at most 4 comma‑separated dimensions.'
+  date: '2026-10-12'
+- breaking: true
+  highlights:
+  - '`deal_date` on news articles and notes, and `announced_date` on funds, are now returned as `YYYY‑MM‑DD` instead of a midnight‑UTC timestamp.'
+  date: '2026-10-09'
+- breaking: true
+  highlights:
+  - A transaction's `year` and `month` are replaced by `announced_date`, and a valuation's by `valued_date`.
+  date: '2026-10-09'
+- breaking: true
+  highlights:
+  - '`created_at` sorted entities by the time Dealroom last loaded them, so it is no longer a sort key; sort by `added_at` instead.'
+  date: '2026-10-09'
+- breaking: true
+  highlights:
+  - The sort keys `date_posted`, `publish_date` and `fund_date` are now `posted_at`, `published_at` and `announced_date`.
+  date: '2026-10-09'
+- breaking: true
+  highlights:
+  - A job opening's `date_posted` is now `posted_at`.
+  date: '2026-10-09'
+- breaking: true
+  highlights:
+  - A news article's or note's `publish_date` is now `published_at`.
+  date: '2026-10-09'
+- breaking: true
+  highlights:
+  - A fund's `fund_date` is now `announced_date`.
+  date: '2026-10-09'
+- breaking: true
+  highlights:
+  - '`GET /data/companies/{id}/web‑traffic` now returns `visits` as `null` for callers without premium access.'
+  date: '2026-10-09'
+- breaking: false
+  highlights:
+  - A request the API cannot accept now returns `400` for every validation failure.
+  date: '2026-10-09'
+- breaking: false
+  highlights:
+  - '`/data/companies/{id}/financials` now returns financial fields as `null` for callers without premium access.'
+  date: '2026-10-09'
+- breaking: false
+  highlights:
+  - '`/analytics/aggregate/universities` and `/analytics/aggregate/gov-ngo` aggregate those organizations directly.'
+  date: '2026-10-08'
+current_version: '2026-10-09'
+note: The changelog page lists the latest version as `2026-10-09`. Entries are ordered newest first and limited to the most recent 12 changes.
+docs: https://developers.dealroom.co/concepts/versioning.md

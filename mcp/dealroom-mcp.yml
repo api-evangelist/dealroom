@@ -1,0 +1,8 @@
+generated: "2026-10-14"
+method: probed
+source: "https://developers.dealroom.co/.well-known/mcp/server-card.json"
+deployment:
+  mode: remote
+  endpoint: "https://dealroomco-prod.main-kill-isr.mintlify.me/mcp"
+  auth: unknown
+  verified: probed

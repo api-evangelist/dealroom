@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/dealroom/main/json-schema/dealroom-filter-values-response-schema.json",
+  "title": "FilterValuesResponse",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/dealroom-api-openapi.yml#/components/schemas/FilterValuesResponse",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "entities_count": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Number of matching entities in the requested scope. `null` unless `include_counts=true`."
+          },
+          "type": {
+            "type": "string"
+          },
+          "parent_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "State or region of a city location, when it has one. `parent_name` stays the country."
+          },
+          "lat": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "lon": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "image": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hq_city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hq_country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "website_domain": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "entities_count"
+        ]
+      }
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "number",
+          "description": "Row count in this response — NOT the total match count. Use `has_more` to detect a next page."
+        },
+        "limit": {
+          "type": "number"
+        },
+        "offset": {
+          "type": "number"
+        },
+        "has_more": {
+          "type": "boolean",
+          "description": "Whether more values exist beyond this page (offset + limit)."
+        }
+      },
+      "required": [
+        "total",
+        "limit",
+        "offset",
+        "has_more"
+      ]
+    }
+  },
+  "required": [
+    "data",
+    "page"
+  ]
+}

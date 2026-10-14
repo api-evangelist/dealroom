@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/dealroom/main/json-schema/dealroom-filters-response-schema.json",
+  "title": "FiltersResponse",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/dealroom-api-openapi.yml#/components/schemas/FiltersResponse",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "filter_key": {
+            "type": "string"
+          },
+          "pinned_sub_type": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "description_long": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "id_lookup",
+              "enum",
+              "boolean",
+              "numeric",
+              "date",
+              "text"
+            ]
+          },
+          "category": {
+            "type": "string"
+          },
+          "operators": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "currency",
+              "year",
+              "count"
+            ]
+          },
+          "supports_type_filter": {
+            "type": "boolean"
+          },
+          "sub_types": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "label"
+              ]
+            }
+          },
+          "data_status": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "stub",
+                  "data-incomplete",
+                  "unloaded",
+                  "partial"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              },
+              "gap_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "reason",
+              "gap_id"
+            ],
+            "description": "Present only when the filter is not fully functional today. See `docs/api-gaps.md` for the full registry."
+          },
+          "deprecated": {
+            "type": "string",
+            "description": "Present when the filter is deprecated: the notice explains the preferred replacement (the filter still works for now)."
+          }
+        },
+        "required": [
+          "key",
+          "filter_key",
+          "label",
+          "type",
+          "category",
+          "operators"
+        ]
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

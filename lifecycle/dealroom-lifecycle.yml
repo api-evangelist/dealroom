@@ -1,0 +1,22 @@
+generated: '2026-10-14'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://developers.dealroom.co/concepts/versioning.md
+sources:
+- https://developers.dealroom.co/concepts/versioning.md
+- https://developers.dealroom.co/changelog.md
+- https://developers.dealroom.co/getting-started/quickstart.md
+- https://developers.dealroom.co/getting-started/agent-setup.md
+versioning:
+  how_selected: header
+  docs: https://developers.dealroom.co/concepts/versioning.md#specifying-a-version
+deprecation:
+  policy: Pinned versions are supported for 30 days past the date they are superseded. After that they are retired on the Sunset date.
+  notice_period: 30 days
+  headers:
+  - Deprecation
+  - Sunset
+  docs: https://developers.dealroom.co/concepts/versioning.md#response-headers
+note: No SLA statement or status page URL is mentioned in the provided pages.
+status_page: null
+docs: https://developers.dealroom.co/concepts/versioning.md

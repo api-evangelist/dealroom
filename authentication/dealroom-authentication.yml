@@ -1,0 +1,27 @@
+generated: '2026-10-14'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://developers.dealroom.co/getting-started/authentication.md
+sources:
+- https://developers.dealroom.co/getting-started/authentication.md
+- https://developers.dealroom.co/getting-started/quickstart.md
+- https://developers.dealroom.co/getting-started/agent-setup.md
+description: Dealroom API authentication
+schemes:
+- type: oauth2
+  name: Dealroom OAuth2 Client Credentials
+  evidence: The Dealroom API uses API keys for server-side integrations. Each key has a `client_id` and `client_secret` and uses the OAuth2 client
+    credentials grant.
+  flows:
+  - client_credentials
+  token_url: https://accounts.dealroom.co/oauth/token
+  how_to_obtain: Create an API key in the Dealroom dashboard (Settings → Developer → API keys) which provides a `client_id` and `client_secret`.
+    Then exchange them for a Bearer token at the token endpoint using the client_credentials grant.
+- type: apiKey
+  name: X-Client-Id header
+  evidence: Safe to share, and sent on every request as the `X-Client-Id` header.
+  location: header
+  header: X-Client-Id
+  how_to_obtain: Use the `client_id` from the API key created in the Dealroom dashboard.
+docs: https://developers.dealroom.co/getting-started/authentication.md
+note: 1 extracted row(s) were dropped because their quote was not on the page.

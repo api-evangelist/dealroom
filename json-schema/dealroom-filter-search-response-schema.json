@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/dealroom/main/json-schema/dealroom-filter-search-response-schema.json",
+  "title": "FilterSearchResponse",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/_original/dealroom-api-openapi.yml#/components/schemas/FilterSearchResponse",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "value"
+                ]
+              },
+              "filter_key": {
+                "type": "string"
+              },
+              "filter_picker_key": {
+                "type": "string"
+              },
+              "filter_label": {
+                "type": "string"
+              },
+              "pinned_sub_type": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "entities_count": {
+                "type": "number"
+              },
+              "source_type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "filter_key",
+              "filter_picker_key",
+              "filter_label",
+              "label",
+              "value"
+            ],
+            "title": "Filter value"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "filter"
+                ]
+              },
+              "filter_key": {
+                "type": "string"
+              },
+              "filter_picker_key": {
+                "type": "string"
+              },
+              "filter_label": {
+                "type": "string"
+              },
+              "pinned_sub_type": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "filter_key",
+              "filter_picker_key",
+              "filter_label",
+              "category"
+            ],
+            "title": "Filter"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "year"
+                ]
+              },
+              "filter_key": {
+                "type": "string"
+              },
+              "filter_picker_key": {
+                "type": "string"
+              },
+              "filter_label": {
+                "type": "string"
+              },
+              "pinned_sub_type": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "gte",
+                  "lte",
+                  "eq"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "filter_key",
+              "filter_picker_key",
+              "filter_label",
+              "label",
+              "value",
+              "operator"
+            ],
+            "title": "Year"
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "data"
+  ]
+}

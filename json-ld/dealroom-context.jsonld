@@ -1,0 +1,795 @@
+{
+  "@context": {
+    "@vocab": "https://dealroom.co/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "dealroom": "https://dealroom.co/schema#",
+    "HealthResponse": "dealroom:HealthResponse",
+    "status": {
+      "@id": "dealroom:status",
+      "@type": "xsd:string"
+    },
+    "timestamp": {
+      "@id": "dealroom:timestamp",
+      "@type": "xsd:dateTime"
+    },
+    "database": {
+      "@id": "dealroom:database",
+      "@type": "xsd:string"
+    },
+    "DiscoveryResponse": "dealroom:DiscoveryResponse",
+    "version": {
+      "@id": "dealroom:version",
+      "@type": "xsd:string"
+    },
+    "groups": {
+      "@id": "dealroom:groups"
+    },
+    "docs": {
+      "@id": "dealroom:docs",
+      "@type": "@id"
+    },
+    "openapi": {
+      "@id": "dealroom:openapi",
+      "@type": "xsd:string"
+    },
+    "NamespaceDiscoveryResponse": "dealroom:NamespaceDiscoveryResponse",
+    "namespace": {
+      "@id": "dealroom:namespace",
+      "@type": "xsd:string"
+    },
+    "description": {
+      "@id": "dealroom:description",
+      "@type": "xsd:string"
+    },
+    "resources": {
+      "@id": "dealroom:resources"
+    },
+    "EntityListResponseFull": "dealroom:EntityListResponseFull",
+    "view": {
+      "@id": "dealroom:view",
+      "@type": "xsd:string"
+    },
+    "data": {
+      "@id": "dealroom:data",
+      "@container": "@list"
+    },
+    "page": {
+      "@id": "dealroom:page",
+      "@type": "@id"
+    },
+    "currency": {
+      "@id": "dealroom:currency",
+      "@type": "xsd:string"
+    },
+    "EntityPerson": "dealroom:EntityPerson",
+    "uuid": {
+      "@id": "dealroom:uuid",
+      "@type": "xsd:string"
+    },
+    "type": {
+      "@id": "dealroom:type",
+      "@type": "xsd:string"
+    },
+    "subtype": {
+      "@id": "dealroom:subtype"
+    },
+    "name": {
+      "@id": "dealroom:name",
+      "@type": "xsd:string"
+    },
+    "tagline": {
+      "@id": "dealroom:tagline",
+      "@type": "xsd:string"
+    },
+    "about": {
+      "@id": "dealroom:about",
+      "@type": "xsd:string"
+    },
+    "image": {
+      "@id": "dealroom:image",
+      "@type": "xsd:string"
+    },
+    "dealroom_url": {
+      "@id": "dealroom:dealroom_url",
+      "@type": "xsd:string"
+    },
+    "links": {
+      "@id": "dealroom:links"
+    },
+    "locations": {
+      "@id": "dealroom:locations",
+      "@container": "@list"
+    },
+    "roles": {
+      "@id": "dealroom:roles",
+      "@container": "@list"
+    },
+    "classifications": {
+      "@id": "dealroom:classifications",
+      "@container": "@list"
+    },
+    "taxonomy": {
+      "@id": "dealroom:taxonomy",
+      "@container": "@list"
+    },
+    "gender": {
+      "@id": "dealroom:gender"
+    },
+    "signal_rating": {
+      "@id": "dealroom:signal_rating",
+      "@type": "xsd:decimal"
+    },
+    "investor": {
+      "@id": "dealroom:investor"
+    },
+    "founded_companies": {
+      "@id": "dealroom:founded_companies"
+    },
+    "career": {
+      "@id": "dealroom:career"
+    },
+    "education": {
+      "@id": "dealroom:education"
+    },
+    "available": {
+      "@id": "dealroom:available",
+      "@container": "@list"
+    },
+    "added_at": {
+      "@id": "dealroom:added_at",
+      "@type": "xsd:dateTime"
+    },
+    "updated_at": {
+      "@id": "dealroom:updated_at",
+      "@type": "xsd:dateTime"
+    },
+    "LocationRole": "dealroom:LocationRole",
+    "EntityRole": "dealroom:EntityRole",
+    "Classification": "dealroom:Classification",
+    "TagType": "dealroom:TagType",
+    "Gender": "dealroom:Gender",
+    "EntityRef": "dealroom:EntityRef",
+    "EntityType": "dealroom:EntityType",
+    "OrganizationSubtype": "dealroom:OrganizationSubtype",
+    "PersonFullBlock": "dealroom:PersonFullBlock",
+    "EntityCompany": "dealroom:EntityCompany",
+    "domain": {
+      "@id": "dealroom:domain",
+      "@type": "xsd:string"
+    },
+    "launch_date": {
+      "@id": "dealroom:launch_date"
+    },
+    "closing_date": {
+      "@id": "dealroom:closing_date"
+    },
+    "employees_count": {
+      "@id": "dealroom:employees_count",
+      "@type": "xsd:decimal"
+    },
+    "employee_count_1y_growth": {
+      "@id": "dealroom:employee_count_1y_growth",
+      "@type": "xsd:decimal"
+    },
+    "unicorn_type": {
+      "@id": "dealroom:unicorn_type",
+      "@type": "xsd:string"
+    },
+    "became_unicorn_date": {
+      "@id": "dealroom:became_unicorn_date"
+    },
+    "became_thoroughbred_date": {
+      "@id": "dealroom:became_thoroughbred_date"
+    },
+    "exit_date": {
+      "@id": "dealroom:exit_date"
+    },
+    "funding": {
+      "@id": "dealroom:funding"
+    },
+    "valuation": {
+      "@id": "dealroom:valuation"
+    },
+    "jobs": {
+      "@id": "dealroom:jobs"
+    },
+    "revenue": {
+      "@id": "dealroom:revenue"
+    },
+    "traffic": {
+      "@id": "dealroom:traffic"
+    },
+    "patents": {
+      "@id": "dealroom:patents"
+    },
+    "founders": {
+      "@id": "dealroom:founders"
+    },
+    "CompanyStatus": "dealroom:CompanyStatus",
+    "PersonClassification": "dealroom:PersonClassification",
+    "CompanyFullBlock": "dealroom:CompanyFullBlock",
+    "EntityUniversity": "dealroom:EntityUniversity",
+    "spinouts_count": {
+      "@id": "dealroom:spinouts_count",
+      "@type": "xsd:decimal"
+    },
+    "alumni": {
+      "@id": "dealroom:alumni"
+    },
+    "UniversityFullBlock": "dealroom:UniversityFullBlock",
+    "EntityGovNgo": "dealroom:EntityGovNgo",
+    "GovNgoFullBlock": "dealroom:GovNgoFullBlock",
+    "EntityInvestor": "dealroom:EntityInvestor",
+    "rank": {
+      "@id": "dealroom:rank",
+      "@type": "xsd:decimal"
+    },
+    "types": {
+      "@id": "dealroom:types",
+      "@container": "@list"
+    },
+    "stages": {
+      "@id": "dealroom:stages",
+      "@container": "@list"
+    },
+    "deal_size": {
+      "@id": "dealroom:deal_size"
+    },
+    "investments": {
+      "@id": "dealroom:investments"
+    },
+    "portfolio": {
+      "@id": "dealroom:portfolio"
+    },
+    "exits": {
+      "@id": "dealroom:exits"
+    },
+    "match": {
+      "@id": "dealroom:match"
+    },
+    "InvestorFullBlock": "dealroom:InvestorFullBlock",
+    "CappedPaginationPage": "dealroom:CappedPaginationPage",
+    "total": {
+      "@id": "dealroom:total",
+      "@type": "xsd:decimal"
+    },
+    "limit": {
+      "@id": "dealroom:limit",
+      "@type": "xsd:decimal"
+    },
+    "offset": {
+      "@id": "dealroom:offset",
+      "@type": "xsd:decimal"
+    },
+    "next_cursor": {
+      "@id": "dealroom:next_cursor",
+      "@type": "xsd:string"
+    },
+    "prev_cursor": {
+      "@id": "dealroom:prev_cursor",
+      "@type": "xsd:string"
+    },
+    "capped": {
+      "@id": "dealroom:capped",
+      "@type": "xsd:boolean"
+    },
+    "tier": {
+      "@id": "dealroom:tier",
+      "@type": "@id"
+    },
+    "ecosystem": {
+      "@id": "dealroom:ecosystem",
+      "@type": "xsd:string"
+    },
+    "AccessTier": "dealroom:AccessTier",
+    "EntityListResponseSummary": "dealroom:EntityListResponseSummary",
+    "PersonSummary": "dealroom:PersonSummary",
+    "CompanySummary": "dealroom:CompanySummary",
+    "UniversitySummary": "dealroom:UniversitySummary",
+    "GovNgoSummary": "dealroom:GovNgoSummary",
+    "InvestorSummary": "dealroom:InvestorSummary",
+    "ErrorResponse": "dealroom:ErrorResponse",
+    "error": {
+      "@id": "dealroom:error"
+    },
+    "GeoPointListResponse": "dealroom:GeoPointListResponse",
+    "GeoPoint": "dealroom:GeoPoint",
+    "lat": {
+      "@id": "dealroom:lat",
+      "@type": "xsd:decimal"
+    },
+    "lon": {
+      "@id": "dealroom:lon",
+      "@type": "xsd:decimal"
+    },
+    "hq_country": {
+      "@id": "dealroom:hq_country",
+      "@type": "xsd:string"
+    },
+    "hq_city": {
+      "@id": "dealroom:hq_city",
+      "@type": "xsd:string"
+    },
+    "EntityDetailResponse": "dealroom:EntityDetailResponse",
+    "EntityLpFundsResponse": "dealroom:EntityLpFundsResponse",
+    "EntityLpFundItem": "dealroom:EntityLpFundItem",
+    "CompanyListResponseFull": "dealroom:CompanyListResponseFull",
+    "Company": "dealroom:Company",
+    "CompanyListResponseSummary": "dealroom:CompanyListResponseSummary",
+    "CompanyGeoResponse": "dealroom:CompanyGeoResponse",
+    "CompanyGeoPoint": "dealroom:CompanyGeoPoint",
+    "id": {
+      "@id": "dealroom:id",
+      "@type": "xsd:string"
+    },
+    "logo": {
+      "@id": "dealroom:logo",
+      "@type": "xsd:string"
+    },
+    "value": {
+      "@id": "dealroom:value",
+      "@type": "xsd:decimal"
+    },
+    "CompanyDetailResponse": "dealroom:CompanyDetailResponse",
+    "EntityTransactionsResponse": "dealroom:EntityTransactionsResponse",
+    "EntityTransactionItem": "dealroom:EntityTransactionItem",
+    "amount": {
+      "@id": "dealroom:amount",
+      "@type": "xsd:decimal"
+    },
+    "announced_date": {
+      "@id": "dealroom:announced_date"
+    },
+    "round_type": {
+      "@id": "dealroom:round_type",
+      "@type": "xsd:string"
+    },
+    "standardized_round": {
+      "@id": "dealroom:standardized_round"
+    },
+    "is_verified": {
+      "@id": "dealroom:is_verified",
+      "@type": "xsd:boolean"
+    },
+    "is_vc_round": {
+      "@id": "dealroom:is_vc_round",
+      "@type": "xsd:boolean"
+    },
+    "is_exit": {
+      "@id": "dealroom:is_exit",
+      "@type": "xsd:boolean"
+    },
+    "investors": {
+      "@id": "dealroom:investors",
+      "@container": "@list"
+    },
+    "source_url": {
+      "@id": "dealroom:source_url",
+      "@type": "xsd:string"
+    },
+    "StandardizedRound": "dealroom:StandardizedRound",
+    "EntityValuationsResponse": "dealroom:EntityValuationsResponse",
+    "EntityValuationItem": "dealroom:EntityValuationItem",
+    "valued_date": {
+      "@id": "dealroom:valued_date"
+    },
+    "is_estimate": {
+      "@id": "dealroom:is_estimate",
+      "@type": "xsd:boolean"
+    },
+    "EntityInvestorsResponse": "dealroom:EntityInvestorsResponse",
+    "EntityInvestorItem": "dealroom:EntityInvestorItem",
+    "is_lead": {
+      "@id": "dealroom:is_lead",
+      "@type": "xsd:boolean"
+    },
+    "rounds_count": {
+      "@id": "dealroom:rounds_count",
+      "@type": "xsd:integer"
+    },
+    "last_round_date": {
+      "@id": "dealroom:last_round_date"
+    },
+    "EntityFinancialsResponse": "dealroom:EntityFinancialsResponse",
+    "FinancialYear": "dealroom:FinancialYear",
+    "year": {
+      "@id": "dealroom:year",
+      "@type": "xsd:decimal"
+    },
+    "ebitda": {
+      "@id": "dealroom:ebitda",
+      "@type": "xsd:decimal"
+    },
+    "profit": {
+      "@id": "dealroom:profit",
+      "@type": "xsd:decimal"
+    },
+    "rnd": {
+      "@id": "dealroom:rnd",
+      "@type": "xsd:decimal"
+    },
+    "employees": {
+      "@id": "dealroom:employees",
+      "@type": "xsd:decimal"
+    },
+    "EntityWebTrafficResponse": "dealroom:EntityWebTrafficResponse",
+    "WebTrafficPoint": "dealroom:WebTrafficPoint",
+    "month": {
+      "@id": "dealroom:month",
+      "@type": "xsd:decimal"
+    },
+    "visits": {
+      "@id": "dealroom:visits",
+      "@type": "xsd:decimal"
+    },
+    "EntityHeadcountBreakdownResponse": "dealroom:EntityHeadcountBreakdownResponse",
+    "HeadcountBreakdownPoint": "dealroom:HeadcountBreakdownPoint",
+    "breakdown_type": {
+      "@id": "dealroom:breakdown_type",
+      "@type": "@id"
+    },
+    "item_id": {
+      "@id": "dealroom:item_id",
+      "@type": "xsd:decimal"
+    },
+    "item_name": {
+      "@id": "dealroom:item_name",
+      "@type": "xsd:string"
+    },
+    "percentage": {
+      "@id": "dealroom:percentage",
+      "@type": "xsd:decimal"
+    },
+    "HeadcountBreakdownType": "dealroom:HeadcountBreakdownType",
+    "EntityTeamResponse": "dealroom:EntityTeamResponse",
+    "EntityTeamMemberItem": "dealroom:EntityTeamMemberItem",
+    "raw_title": {
+      "@id": "dealroom:raw_title",
+      "@type": "xsd:string"
+    },
+    "titles": {
+      "@id": "dealroom:titles",
+      "@container": "@list"
+    },
+    "is_founder": {
+      "@id": "dealroom:is_founder",
+      "@type": "xsd:boolean"
+    },
+    "is_executive": {
+      "@id": "dealroom:is_executive",
+      "@type": "xsd:boolean"
+    },
+    "is_partner": {
+      "@id": "dealroom:is_partner",
+      "@type": "xsd:boolean"
+    },
+    "is_past": {
+      "@id": "dealroom:is_past",
+      "@type": "xsd:boolean"
+    },
+    "start_date": {
+      "@id": "dealroom:start_date"
+    },
+    "end_date": {
+      "@id": "dealroom:end_date"
+    },
+    "person": {
+      "@id": "dealroom:person",
+      "@type": "@id"
+    },
+    "EntityPatentsResponse": "dealroom:EntityPatentsResponse",
+    "EntityPatentItem": "dealroom:EntityPatentItem",
+    "publication_number": {
+      "@id": "dealroom:publication_number",
+      "@type": "xsd:string"
+    },
+    "title": {
+      "@id": "dealroom:title",
+      "@type": "xsd:string"
+    },
+    "abstract": {
+      "@id": "dealroom:abstract",
+      "@type": "xsd:string"
+    },
+    "value_usd": {
+      "@id": "dealroom:value_usd",
+      "@type": "xsd:decimal"
+    },
+    "value_scores": {
+      "@id": "dealroom:value_scores"
+    },
+    "authority": {
+      "@id": "dealroom:authority",
+      "@type": "xsd:string"
+    },
+    "patent_type": {
+      "@id": "dealroom:patent_type",
+      "@type": "xsd:string"
+    },
+    "application_date": {
+      "@id": "dealroom:application_date",
+      "@type": "xsd:date"
+    },
+    "publication_date": {
+      "@id": "dealroom:publication_date",
+      "@type": "xsd:date"
+    },
+    "estimated_expiry_date": {
+      "@id": "dealroom:estimated_expiry_date",
+      "@type": "xsd:date"
+    },
+    "cpc": {
+      "@id": "dealroom:cpc",
+      "@type": "xsd:string"
+    },
+    "ipc": {
+      "@id": "dealroom:ipc",
+      "@type": "xsd:string"
+    },
+    "assignees": {
+      "@id": "dealroom:assignees",
+      "@container": "@list"
+    },
+    "inventors": {
+      "@id": "dealroom:inventors",
+      "@container": "@list"
+    },
+    "UniversityListResponseFull": "dealroom:UniversityListResponseFull",
+    "University": "dealroom:University",
+    "UniversityListResponseSummary": "dealroom:UniversityListResponseSummary",
+    "UniversityGeoResponse": "dealroom:UniversityGeoResponse",
+    "UniversityGeoPoint": "dealroom:UniversityGeoPoint",
+    "UniversityDetailResponse": "dealroom:UniversityDetailResponse",
+    "UniversityAlumniResponse": "dealroom:UniversityAlumniResponse",
+    "UniversityAlumniItem": "dealroom:UniversityAlumniItem",
+    "degrees": {
+      "@id": "dealroom:degrees",
+      "@container": "@list"
+    },
+    "GovNgoListResponseFull": "dealroom:GovNgoListResponseFull",
+    "GovNgo": "dealroom:GovNgo",
+    "GovNgoListResponseSummary": "dealroom:GovNgoListResponseSummary",
+    "GovNgoGeoResponse": "dealroom:GovNgoGeoResponse",
+    "GovNgoGeoPoint": "dealroom:GovNgoGeoPoint",
+    "GovNgoDetailResponse": "dealroom:GovNgoDetailResponse",
+    "TransactionListResponse": "dealroom:TransactionListResponse",
+    "Transaction": "dealroom:Transaction",
+    "company": {
+      "@id": "dealroom:company",
+      "@type": "@id"
+    },
+    "deleted_at": {
+      "@id": "dealroom:deleted_at",
+      "@type": "xsd:dateTime"
+    },
+    "TransactionDetailResponse": "dealroom:TransactionDetailResponse",
+    "ValuationListResponse": "dealroom:ValuationListResponse",
+    "Valuation": "dealroom:Valuation",
+    "entity": {
+      "@id": "dealroom:entity",
+      "@type": "@id"
+    },
+    "ValuationDetailResponse": "dealroom:ValuationDetailResponse",
+    "InvestorListResponseFull": "dealroom:InvestorListResponseFull",
+    "Person": "dealroom:Person",
+    "Investor": "dealroom:Investor",
+    "InvestorListResponseSummary": "dealroom:InvestorListResponseSummary",
+    "InvestorGeoResponse": "dealroom:InvestorGeoResponse",
+    "InvestorGeoPoint": "dealroom:InvestorGeoPoint",
+    "InvestorDetailResponse": "dealroom:InvestorDetailResponse",
+    "EntityInvestmentsResponse": "dealroom:EntityInvestmentsResponse",
+    "EntityInvestmentItem": "dealroom:EntityInvestmentItem",
+    "EntityFundsResponse": "dealroom:EntityFundsResponse",
+    "EntityFundItem": "dealroom:EntityFundItem",
+    "fund_type": {
+      "@id": "dealroom:fund_type",
+      "@type": "xsd:string"
+    },
+    "amount_source": {
+      "@id": "dealroom:amount_source",
+      "@type": "@id"
+    },
+    "is_closed": {
+      "@id": "dealroom:is_closed",
+      "@type": "xsd:boolean"
+    },
+    "EntityFundAmountSource": "dealroom:EntityFundAmountSource",
+    "FundListResponse": "dealroom:FundListResponse",
+    "Fund": "dealroom:Fund",
+    "manager": {
+      "@id": "dealroom:manager",
+      "@type": "@id"
+    },
+    "FundAmountSource": "dealroom:FundAmountSource",
+    "FundDetailResponse": "dealroom:FundDetailResponse",
+    "FounderListResponseFull": "dealroom:FounderListResponseFull",
+    "Founder": "dealroom:Founder",
+    "FounderListResponseSummary": "dealroom:FounderListResponseSummary",
+    "FounderDetailResponse": "dealroom:FounderDetailResponse",
+    "PersonCareerResponse": "dealroom:PersonCareerResponse",
+    "PersonCareerItem": "dealroom:PersonCareerItem",
+    "PersonListResponseFull": "dealroom:PersonListResponseFull",
+    "PersonListResponseSummary": "dealroom:PersonListResponseSummary",
+    "PersonDetailResponse": "dealroom:PersonDetailResponse",
+    "PersonEducationResponse": "dealroom:PersonEducationResponse",
+    "PersonEducationItem": "dealroom:PersonEducationItem",
+    "degree": {
+      "@id": "dealroom:degree"
+    },
+    "majors": {
+      "@id": "dealroom:majors",
+      "@container": "@list"
+    },
+    "university": {
+      "@id": "dealroom:university",
+      "@type": "@id"
+    },
+    "NewsListResponse": "dealroom:NewsListResponse",
+    "NewsArticle": "dealroom:NewsArticle",
+    "url": {
+      "@id": "dealroom:url",
+      "@type": "xsd:string"
+    },
+    "slug": {
+      "@id": "dealroom:slug",
+      "@type": "xsd:string"
+    },
+    "summary": {
+      "@id": "dealroom:summary",
+      "@type": "xsd:string"
+    },
+    "preview": {
+      "@id": "dealroom:preview",
+      "@type": "xsd:string"
+    },
+    "image_url": {
+      "@id": "dealroom:image_url",
+      "@type": "xsd:string"
+    },
+    "image_source": {
+      "@id": "dealroom:image_source",
+      "@type": "xsd:string"
+    },
+    "source": {
+      "@id": "dealroom:source",
+      "@type": "xsd:string"
+    },
+    "article_type": {
+      "@id": "dealroom:article_type",
+      "@type": "xsd:string"
+    },
+    "category": {
+      "@id": "dealroom:category",
+      "@type": "xsd:string"
+    },
+    "news_types": {
+      "@id": "dealroom:news_types",
+      "@container": "@list"
+    },
+    "is_news": {
+      "@id": "dealroom:is_news",
+      "@type": "xsd:boolean"
+    },
+    "published_at": {
+      "@id": "dealroom:published_at",
+      "@type": "xsd:dateTime"
+    },
+    "deal_date": {
+      "@id": "dealroom:deal_date",
+      "@type": "xsd:date"
+    },
+    "sector": {
+      "@id": "dealroom:sector",
+      "@type": "xsd:string"
+    },
+    "enriched_summary": {
+      "@id": "dealroom:enriched_summary",
+      "@type": "xsd:string"
+    },
+    "importance_score": {
+      "@id": "dealroom:importance_score",
+      "@type": "xsd:decimal"
+    },
+    "is_pinned": {
+      "@id": "dealroom:is_pinned",
+      "@type": "xsd:boolean"
+    },
+    "source_urls": {
+      "@id": "dealroom:source_urls",
+      "@container": "@list"
+    },
+    "references": {
+      "@id": "dealroom:references",
+      "@container": "@list"
+    },
+    "video_urls": {
+      "@id": "dealroom:video_urls",
+      "@container": "@list"
+    },
+    "pitch_deck_urls": {
+      "@id": "dealroom:pitch_deck_urls",
+      "@container": "@list"
+    },
+    "author_entity_id": {
+      "@id": "dealroom:author_entity_id",
+      "@type": "xsd:decimal"
+    },
+    "author_kind": {
+      "@id": "dealroom:author_kind",
+      "@type": "xsd:string"
+    },
+    "created_at": {
+      "@id": "dealroom:created_at",
+      "@type": "xsd:dateTime"
+    },
+    "entities": {
+      "@id": "dealroom:entities",
+      "@container": "@list"
+    },
+    "NewsDetailResponse": "dealroom:NewsDetailResponse",
+    "NotesListResponse": "dealroom:NotesListResponse",
+    "Note": "dealroom:Note",
+    "NoteDetailResponse": "dealroom:NoteDetailResponse",
+    "JobsListResponse": "dealroom:JobsListResponse",
+    "Job": "dealroom:Job",
+    "job_type": {
+      "@id": "dealroom:job_type",
+      "@type": "xsd:string"
+    },
+    "formatted_location": {
+      "@id": "dealroom:formatted_location",
+      "@type": "xsd:string"
+    },
+    "post_language": {
+      "@id": "dealroom:post_language",
+      "@type": "xsd:string"
+    },
+    "latitude": {
+      "@id": "dealroom:latitude",
+      "@type": "xsd:decimal"
+    },
+    "longitude": {
+      "@id": "dealroom:longitude",
+      "@type": "xsd:decimal"
+    },
+    "posted_at": {
+      "@id": "dealroom:posted_at",
+      "@type": "xsd:dateTime"
+    },
+    "city_unique_id": {
+      "@id": "dealroom:city_unique_id",
+      "@type": "xsd:decimal"
+    },
+    "state_unique_id": {
+      "@id": "dealroom:state_unique_id",
+      "@type": "xsd:decimal"
+    },
+    "country_unique_id": {
+      "@id": "dealroom:country_unique_id",
+      "@type": "xsd:decimal"
+    },
+    "continent_unique_id": {
+      "@id": "dealroom:continent_unique_id",
+      "@type": "xsd:decimal"
+    },
+    "city_region_unique_ids": {
+      "@id": "dealroom:city_region_unique_ids",
+      "@container": "@list"
+    },
+    "JobDetailResponse": "dealroom:JobDetailResponse",
+    "SearchResponse": "dealroom:SearchResponse",
+    "AggregateResponse": "dealroom:AggregateResponse",
+    "query_info": {
+      "@id": "dealroom:query_info"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Dealroom API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Dealroom's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-14) from openapi/_original/dealroom-api-openapi.yml.",
+  "dcterms:created": "2026-10-14",
+  "dcterms:source": [
+    "openapi/_original/dealroom-api-openapi.yml"
+  ]
+}
