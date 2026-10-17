@@ -1,0 +1,4074 @@
+openapi: 3.2.0
+info:
+  title: Dealroom People API
+  version: '2026-10-09'
+  description: REST API for the Dealroom platform — companies, funds, founders, investors, funding rounds, valuations, taxonomy, news, and aggregate analytics across all of them. Authentication uses Auth0 (Bearer JWT or OAuth2 client_credentials). All endpoints are versioned via the `API-Version` header (Stripe-style date-based versioning).
+  contact:
+    name: Dealroom API support
+    email: support@dealroom.co
+    url: https://dealroom.co
+  termsOfService: https://dealroom.co/terms
+  license:
+    name: Proprietary — Dealroom commercial license
+    url: https://dealroom.co/terms
+servers:
+- url: https://api.dealroom.app
+  description: Production
+security:
+- bearerAuth: []
+- oauth2: []
+tags:
+- name: People
+  description: Person profiles (founders, executives, angels, and others). Subset of entities where `entity_type = 'person'`. Same response shape as founders, with company associations, education, and tags.
+paths:
+  /data/people:
+    get:
+      operationId: listPeople
+      security:
+      - oauth2:
+        - read:people
+      - bearerAuth:
+        - read:people
+      tags:
+      - People
+      summary: List people
+      description: Returns a paginated list of all person entities (entity_type='person'), including company associations, education history, and tags (including professional backgrounds). Supports the same filter syntax as other endpoints.
+      parameters:
+      - schema:
+          type: string
+          description: 'Filter expression for people using nested syntax.
+
+
+            Examples:
+
+            - Single: hq_location[eq]:233
+
+            - AND: and(hq_location[eq]:233,classification[in_any]:super_founder)
+
+
+            Operators: eq, neq, gt, gte, lt, lte, in_any, nin_any
+
+            in_all / nin_all are available on repeated related-record filters and on the classification / roles flag sets.
+
+            Default ref: ''entity'' (can be omitted for entity filters)
+
+            '
+          example: hq_location[eq]:233
+        required: false
+        description: 'Filter expression for people using nested syntax.
+
+
+          Examples:
+
+          - Single: hq_location[eq]:233
+
+          - AND: and(hq_location[eq]:233,classification[in_any]:super_founder)
+
+
+          Operators: eq, neq, gt, gte, lt, lte, in_any, nin_any
+
+          in_all / nin_all are available on repeated related-record filters and on the classification / roles flag sets.
+
+          Default ref: ''entity'' (can be omitted for entity filters)
+
+          '
+        name: filter
+        in: query
+      - schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 500
+          default: 25
+          description: Number of results to return (1-500, default 25)
+          example: 25
+        required: false
+        description: Number of results to return (1-500, default 25)
+        name: limit
+        in: query
+      - schema:
+          type: string
+          description: Opaque cursor token from a previous response's `page.next_cursor` or `page.prev_cursor`. Round-trip it as-is — do not decode or modify.
+          example: eyJ2IjoxLCJkIjoibmV4dCJ9
+        required: false
+        description: Opaque cursor token from a previous response's `page.next_cursor` or `page.prev_cursor`. Round-trip it as-is — do not decode or modify.
+        name: cursor
+        in: query
+      - schema:
+          type: string
+          pattern: ^(?:-?\w+)?(?:,(?:-?\w+)?)*$
+          description: Sort by one or more keys. Prefix with `-` for descending order; comma-separated for multi-key sorts.
+          example: -signal_rating
+        required: false
+        description: Sort by one or more keys. Prefix with `-` for descending order; comma-separated for multi-key sorts.
+        name: sort
+        in: query
+      - schema:
+          type: boolean
+          description: Pass `true` to compute `page.total` (the matching record count). By default no count query runs and `page.total` is `null`.
+          example: true
+        required: false
+        description: Pass `true` to compute `page.total` (the matching record count). By default no count query runs and `page.total` is `null`.
+        name: include_total
+        in: query
+      - schema:
+          type: string
+          description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+          example: EUR
+        required: false
+        description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+        name: currency
+        in: query
+      - schema:
+          type: string
+          enum:
+          - full
+          - summary
+          default: full
+          description: Which row shape to return, echoed as `view` in the response. `full` is the complete row, priced as a full record. `summary` drops the full-only blocks (founders, revenue, traffic, patents, alumni, founded_companies, career, education, portfolio, exits, match, rank) and is priced as a summary record.
+          example: summary
+        required: false
+        description: Which row shape to return, echoed as `view` in the response. `full` is the complete row, priced as a full record. `summary` drops the full-only blocks (founders, revenue, traffic, patents, alumni, founded_companies, career, education, portfolio, exits, match, rank) and is priced as a summary record.
+        name: view
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: List of people
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonListResponse'
+              examples:
+                person_full:
+                  summary: Person — full row
+                  value:
+                    view: full
+                    data:
+                    - uuid: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+                      type: person
+                      subtype: null
+                      name: Patrick Collison
+                      tagline: <string>
+                      about: <string>
+                      image: <string>
+                      dealroom_url: <string>
+                      links:
+                        linkedin: <string>
+                        twitter: <string>
+                        angellist: <string>
+                        crunchbase: <string>
+                      locations:
+                      - role: hq
+                        city:
+                          id: 123
+                          name: <string>
+                        state:
+                          id: 123
+                          name: <string>
+                        country:
+                          id: 123
+                          name: <string>
+                        continent:
+                          id: 123
+                          name: <string>
+                        lat: 123
+                        lon: 123
+                      roles:
+                      - founder
+                      classifications:
+                      - startup
+                      taxonomy:
+                      - id: 123
+                        name: <string>
+                        type: sector
+                      gender: male
+                      signal_rating: 123
+                      investor:
+                        rank: 123
+                        types:
+                        - id: 123
+                          name: <string>
+                          code: <string>
+                        stages:
+                        - id: 123
+                          name: <string>
+                          code: <string>
+                        deal_size:
+                          min: 123
+                          max: 123
+                        investments:
+                          count: 123
+                          total_invested: 123
+                          preferred_round: <string>
+                          last_round_date: 2024-03
+                        portfolio:
+                          rounds_count: 123
+                          total_valuation: 123
+                          companies:
+                            total: 123
+                            sort: -last_round_date
+                            items:
+                            - is_lead: true
+                              rounds_count: 123
+                              last_round_date: 2024-03
+                              company:
+                                uuid: <string>
+                                type: organization
+                                subtype: company
+                                name: <string>
+                                image: <string>
+                                dealroom_url: <string>
+                        exits:
+                          count: 123
+                          total_value: 123
+                          pct: 123
+                        match:
+                          companies_count: 123
+                          invested: 123
+                      founded_companies:
+                        count: 123
+                        total_funding: 123
+                      career:
+                        total: 123
+                        sort: -is_founder,is_past,-start_date
+                        items:
+                        - raw_title: <string>
+                          titles:
+                          - <string>
+                          is_founder: true
+                          is_executive: true
+                          is_partner: true
+                          is_past: true
+                          start_date: 2024-03
+                          end_date: 2024-03
+                          company:
+                            uuid: <string>
+                            type: organization
+                            subtype: company
+                            name: <string>
+                            image: <string>
+                            dealroom_url: <string>
+                      education:
+                        total: 123
+                        sort: -start_date
+                        items:
+                        - degree:
+                            id: 123
+                            name: <string>
+                          majors:
+                          - id: 123
+                            name: <string>
+                          start_date: 2024-03
+                          end_date: 2024-03
+                          university:
+                            uuid: <string>
+                            type: organization
+                            subtype: university
+                            name: <string>
+                            image: <string>
+                            dealroom_url: <string>
+                      available:
+                      - founded_companies
+                      added_at: <string>
+                      updated_at: <string>
+                    page:
+                      total: 123
+                      limit: 123
+                      offset: 123
+                      next_cursor: <string>
+                      prev_cursor: <string>
+                    currency: EUR
+                person_summary:
+                  summary: Person — summary row
+                  value:
+                    view: summary
+                    data:
+                    - uuid: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+                      type: person
+                      subtype: null
+                      name: Patrick Collison
+                      tagline: <string>
+                      about: <string>
+                      image: <string>
+                      dealroom_url: <string>
+                      links:
+                        linkedin: <string>
+                        twitter: <string>
+                        angellist: <string>
+                        crunchbase: <string>
+                      locations:
+                      - role: hq
+                        city:
+                          id: 123
+                          name: <string>
+                        state:
+                          id: 123
+                          name: <string>
+                        country:
+                          id: 123
+                          name: <string>
+                        continent:
+                          id: 123
+                          name: <string>
+                        lat: 123
+                        lon: 123
+                      roles:
+                      - founder
+                      classifications:
+                      - startup
+                      taxonomy:
+                      - id: 123
+                        name: <string>
+                        type: sector
+                      gender: male
+                      signal_rating: 123
+                      investor:
+                        types:
+                        - id: 123
+                          name: <string>
+                          code: <string>
+                        stages:
+                        - id: 123
+                          name: <string>
+                          code: <string>
+                        deal_size:
+                          min: 123
+                          max: 123
+                        investments:
+                          count: 123
+                          total_invested: 123
+                          preferred_round: <string>
+                          last_round_date: 2024-03
+                      added_at: <string>
+                      updated_at: <string>
+                    page:
+                      total: 123
+                      limit: 123
+                      offset: 123
+                      next_cursor: <string>
+                      prev_cursor: <string>
+                    currency: EUR
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: The request was malformed or failed validation.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '402':
+          description: '`CREDITS_EXHAUSTED` — the caller''s team has no credits left, or none granted yet. Only API-key and MCP requests are capped.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+        '503':
+          description: '`SERVICE_UNAVAILABLE` — the caller''s team credits could not be checked. Retry shortly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: SERVICE_UNAVAILABLE
+                  message: The service is temporarily unavailable.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+  /data/people/{id}:
+    get:
+      operationId: getPerson
+      security:
+      - oauth2:
+        - read:people
+      - bearerAuth:
+        - read:people
+      tags:
+      - People
+      summary: Get single person
+      description: Returns the full person profile by UUID (numeric IDs are not accepted). Covers all person entities (founders, executives, angels, and others). Includes biographic details, professional history, education, and background tags.
+      parameters:
+      - schema:
+          type: string
+          minLength: 1
+          format: uuid
+          example: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+          description: Stable UUID of the entity. Numeric ids are not accepted.
+        required: true
+        description: Stable UUID of the entity. Numeric ids are not accepted.
+        name: id
+        in: path
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Single person
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDetailResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '402':
+          description: '`CREDITS_EXHAUSTED` — the caller''s team has no credits left, or none granted yet. Only API-key and MCP requests are capped.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '404':
+          description: Person not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: NOT_FOUND
+                  message: The requested resource was not found.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+        '503':
+          description: '`SERVICE_UNAVAILABLE` — the caller''s team credits could not be checked. Retry shortly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: SERVICE_UNAVAILABLE
+                  message: The service is temporarily unavailable.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+  /data/people/{id}/career:
+    get:
+      operationId: personCareer
+      security:
+      - oauth2:
+        - read:people
+      - bearerAuth:
+        - read:people
+      tags:
+      - People
+      summary: List career history
+      description: The companies and other organizations this person is or was associated with through the people_entities relationship — with their role flags (founder / executive / partner), title(s), and tenure at each. De-duplicated to one row per organization, founding roles first, then current ones. Use `?role=` to restrict to a single relationship role, and the same entity `?filter[...]` DSL as `/data/companies` to filter the organizations. Each row carries the organization as its summary row; `sort=-is_founder,is_past,-start_date` is the default order and the one the `career` glance on the person row uses.
+      parameters:
+      - schema:
+          type: string
+          minLength: 1
+          format: uuid
+          example: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+          description: Stable UUID of the entity. Numeric ids are not accepted.
+        required: true
+        description: Stable UUID of the entity. Numeric ids are not accepted.
+        name: id
+        in: path
+      - schema:
+          type: string
+          description: 'Filter expression for the associated organizations — same syntax and keys as /data/companies.
+
+
+            Examples:
+
+            - Single: launch_date[gte]:2015
+
+            - AND: and(launch_date[gte]:2015,hq_location[eq]:233)
+
+
+            Operators: eq, neq, gt, gte, lt, lte, in_any, nin_any
+
+            Default ref: ''entity''
+
+            '
+          example: launch_date[gte]:2015
+        required: false
+        description: 'Filter expression for the associated organizations — same syntax and keys as /data/companies.
+
+
+          Examples:
+
+          - Single: launch_date[gte]:2015
+
+          - AND: and(launch_date[gte]:2015,hq_location[eq]:233)
+
+
+          Operators: eq, neq, gt, gte, lt, lte, in_any, nin_any
+
+          Default ref: ''entity''
+
+          '
+        name: filter
+        in: query
+      - schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 500
+          default: 25
+          description: Number of results to return (1-500, default 25)
+          example: 25
+        required: false
+        description: Number of results to return (1-500, default 25)
+        name: limit
+        in: query
+      - schema:
+          type: string
+          description: Opaque cursor token from a previous response's `page.next_cursor` or `page.prev_cursor`. Round-trip it as-is — do not decode or modify.
+          example: eyJ2IjoxLCJkIjoibmV4dCJ9
+        required: false
+        description: Opaque cursor token from a previous response's `page.next_cursor` or `page.prev_cursor`. Round-trip it as-is — do not decode or modify.
+        name: cursor
+        in: query
+      - schema:
+          type: string
+          pattern: ^(?:-?\w+)?(?:,(?:-?\w+)?)*$
+          description: Sort by one or more keys. Prefix with `-` for descending order; comma-separated for multi-key sorts.
+          example: name
+        required: false
+        description: Sort by one or more keys. Prefix with `-` for descending order; comma-separated for multi-key sorts.
+        name: sort
+        in: query
+      - schema:
+          type: boolean
+          description: Pass `true` to compute `page.total` (the matching record count). By default no count query runs and `page.total` is `null`.
+          example: true
+        required: false
+        description: Pass `true` to compute `page.total` (the matching record count). By default no count query runs and `page.total` is `null`.
+        name: include_total
+        in: query
+      - schema:
+          type: string
+          description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+          example: EUR
+        required: false
+        description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+        name: currency
+        in: query
+      - schema:
+          type: string
+          enum:
+          - founder
+          - executive
+          - partner
+          description: 'Restrict to a single relationship role at the associated organization: `founder`, `executive`, or `partner`. Omit to include all.'
+          example: founder
+        required: false
+        description: 'Restrict to a single relationship role at the associated organization: `founder`, `executive`, or `partner`. Omit to include all.'
+        name: role
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Person career history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonCareerResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '400':
+          description: Invalid entity ID or request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: The request was malformed or failed validation.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '402':
+          description: '`CREDITS_EXHAUSTED` — the caller''s team has no credits left, or none granted yet. Only API-key and MCP requests are capped.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+        '503':
+          description: '`SERVICE_UNAVAILABLE` — the caller''s team credits could not be checked. Retry shortly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: SERVICE_UNAVAILABLE
+                  message: The service is temporarily unavailable.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+  /data/people/{id}/education:
+    get:
+      operationId: personEducation
+      security:
+      - oauth2:
+        - read:people
+      - bearerAuth:
+        - read:people
+      tags:
+      - People
+      summary: List education
+      description: The person's education records — degree, majors and years — each with the university as its summary row. Most recent first (`sort=-start_date`), the order the `education` glance on the person row uses.
+      parameters:
+      - schema:
+          type: string
+          minLength: 1
+          format: uuid
+          example: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+          description: Stable UUID of the entity. Numeric ids are not accepted.
+        required: true
+        description: Stable UUID of the entity. Numeric ids are not accepted.
+        name: id
+        in: path
+      - schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 500
+          default: 25
+          description: Number of results to return (1-500, default 25)
+          example: 25
+        required: false
+        description: Number of results to return (1-500, default 25)
+        name: limit
+        in: query
+      - schema:
+          type: string
+          description: Opaque cursor token from a previous response's `page.next_cursor` or `page.prev_cursor`. Round-trip it as-is — do not decode or modify.
+          example: eyJ2IjoxLCJkIjoibmV4dCJ9
+        required: false
+        description: Opaque cursor token from a previous response's `page.next_cursor` or `page.prev_cursor`. Round-trip it as-is — do not decode or modify.
+        name: cursor
+        in: query
+      - schema:
+          type: string
+          pattern: ^(?:-?\w+)?(?:,(?:-?\w+)?)*$
+          description: Sort by one or more keys. Prefix with `-` for descending order; comma-separated for multi-key sorts.
+          example: -start_date
+        required: false
+        description: Sort by one or more keys. Prefix with `-` for descending order; comma-separated for multi-key sorts.
+        name: sort
+        in: query
+      - schema:
+          type: boolean
+          description: Pass `true` to compute `page.total` (the matching record count). By default no count query runs and `page.total` is `null`.
+          example: true
+        required: false
+        description: Pass `true` to compute `page.total` (the matching record count). By default no count query runs and `page.total` is `null`.
+        name: include_total
+        in: query
+      - schema:
+          type: string
+          description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+          example: EUR
+        required: false
+        description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+        name: currency
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Person education records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonEducationResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '400':
+          description: Invalid entity ID or request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: The request was malformed or failed validation.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '402':
+          description: '`CREDITS_EXHAUSTED` — the caller''s team has no credits left, or none granted yet. Only API-key and MCP requests are capped.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+        '503':
+          description: '`SERVICE_UNAVAILABLE` — the caller''s team credits could not be checked. Retry shortly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: SERVICE_UNAVAILABLE
+                  message: The service is temporarily unavailable.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+components:
+  schemas:
+    PersonEducationResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonEducationItem'
+        page:
+          type: object
+          properties:
+            total:
+              type:
+              - number
+              - 'null'
+            limit:
+              type: number
+            offset:
+              type: number
+            next_cursor:
+              type:
+              - string
+              - 'null'
+              description: Opaque cursor for the next page. Null when no further pages exist.
+            prev_cursor:
+              type:
+              - string
+              - 'null'
+              description: Opaque cursor for the previous page. Null when on the first page.
+          required:
+          - total
+          - limit
+          - offset
+          - next_cursor
+          - prev_cursor
+        currency:
+          type: string
+          description: Currency the participant's monetary fields are expressed in (default USD).
+          example: EUR
+      required:
+      - data
+      - page
+      - currency
+    PersonCareerResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonCareerItem'
+        page:
+          type: object
+          properties:
+            total:
+              type:
+              - number
+              - 'null'
+            limit:
+              type: number
+            offset:
+              type: number
+            next_cursor:
+              type:
+              - string
+              - 'null'
+              description: Opaque cursor for the next page. Null when no further pages exist.
+            prev_cursor:
+              type:
+              - string
+              - 'null'
+              description: Opaque cursor for the previous page. Null when on the first page.
+          required:
+          - total
+          - limit
+          - offset
+          - next_cursor
+          - prev_cursor
+        currency:
+          type: string
+          description: Currency the participant's monetary fields are expressed in (default USD).
+          example: EUR
+      required:
+      - data
+      - page
+      - currency
+    CompanySummary:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Stable UUID of the entity; the sole public identifier.
+          example: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+        type:
+          type: string
+          enum:
+          - organization
+          description: Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`.
+        domain:
+          type:
+          - string
+          - 'null'
+          description: Registrable domain, e.g. "stripe.com".
+          example: stripe.com
+        name:
+          type: string
+          description: Display name.
+          example: Stripe
+        tagline:
+          type:
+          - string
+          - 'null'
+          description: One-line description.
+        about:
+          type:
+          - string
+          - 'null'
+          description: Long-form description.
+        image:
+          type:
+          - string
+          - 'null'
+          description: Absolute logo URL.
+        dealroom_url:
+          type:
+          - string
+          - 'null'
+          description: Canonical profile URL on app.dealroom.co.
+        links:
+          type: object
+          properties:
+            website:
+              type:
+              - string
+              - 'null'
+              description: Website URL.
+            linkedin:
+              type:
+              - string
+              - 'null'
+              description: LinkedIn profile URL.
+            twitter:
+              type:
+              - string
+              - 'null'
+              description: Twitter / X profile URL.
+            instagram:
+              type:
+              - string
+              - 'null'
+              description: Instagram URL or handle.
+            angellist:
+              type:
+              - string
+              - 'null'
+              description: AngelList URL or handle.
+            crunchbase:
+              type:
+              - string
+              - 'null'
+              description: Crunchbase profile URL.
+          required:
+          - website
+          - linkedin
+          - twitter
+          - instagram
+          - angellist
+          - crunchbase
+          description: The entity's own presence on the web; each null when unknown.
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                $ref: '#/components/schemas/LocationRole'
+              city:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: City; null when not known.
+              state:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: State or region; null when none.
+              country:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Country.
+              continent:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Continent.
+              lat:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+              lon:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+            required:
+            - role
+            - city
+            - state
+            - country
+            - continent
+            - lat
+            - lon
+          description: 'Every location: hq, founding, then offices; empty when none.'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRole'
+          description: 'Roles the organization plays: `investor`, `limited_partner`, `fund_manager`.'
+        taxonomy:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: Numeric identifier of the tag.
+              name:
+                type: string
+                description: Display name of the tag.
+              type:
+                $ref: '#/components/schemas/TagType'
+            required:
+            - id
+            - name
+            - type
+          description: Taxonomy terms (industries, sectors, technologies, …); empty when none.
+        launch_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the organization was founded, at source precision.
+        closing_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the organization closed; null while active.
+        employees_count:
+          type:
+          - number
+          - 'null'
+          description: Number of employees.
+        added_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the organization was added to Dealroom (RFC 3339).
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the record was last modified (RFC 3339).
+        subtype:
+          type: string
+          enum:
+          - company
+          description: Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons.
+        classifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Classification'
+          description: Dealroom labels; empty when none.
+        employee_count_1y_growth:
+          type:
+          - number
+          - 'null'
+          description: Year-over-year employee growth, %.
+        status:
+          anyOf:
+          - $ref: '#/components/schemas/CompanyStatus'
+          - type: 'null'
+          description: Operational status.
+        signal_rating:
+          type:
+          - number
+          - 'null'
+          description: Dealroom Signal rating (0-100).
+        unicorn_type:
+          type:
+          - string
+          - 'null'
+          description: Unicorn tier, e.g. "unicorn", "decacorn".
+        became_unicorn_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the company reached a $1B valuation.
+        became_thoroughbred_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the company was verified as a Thoroughbred.
+        exit_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the company exited (IPO or acquisition).
+        investor:
+          type:
+          - object
+          - 'null'
+          properties:
+            types:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Investor types; empty when none.
+            stages:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Stages invested in; empty when none.
+            deal_size:
+              type:
+              - object
+              - 'null'
+              properties:
+                min:
+                  type:
+                  - number
+                  - 'null'
+                  description: Smallest ticket, active currency.
+                max:
+                  type:
+                  - number
+                  - 'null'
+                  description: Largest ticket, active currency.
+              required:
+              - min
+              - max
+              description: Ticket size range; null when unknown.
+            investments:
+              type: object
+              properties:
+                count:
+                  type:
+                  - number
+                  - 'null'
+                  description: Investments made.
+                total_invested:
+                  type:
+                  - number
+                  - 'null'
+                  description: Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency.
+                preferred_round:
+                  type:
+                  - string
+                  - 'null'
+                  description: Most frequent round stage, e.g. `series_a`.
+                last_round_date:
+                  anyOf:
+                  - $ref: '#/components/schemas/PartialDate'
+                  - type: 'null'
+                  description: Date of the most recent investment round, at source precision.
+              required:
+              - count
+              - total_invested
+              - preferred_round
+              - last_round_date
+              description: Investment activity.
+          required:
+          - types
+          - stages
+          - deal_size
+          - investments
+          description: The organization's investing profile; null unless it invests.
+        funding:
+          type:
+          - object
+          - 'null'
+          properties:
+            total:
+              type:
+              - number
+              - 'null'
+              description: Total raised, active currency.
+            total_vc:
+              type:
+              - number
+              - 'null'
+              description: VC-only share of `total`.
+            rounds_count:
+              type:
+              - number
+              - 'null'
+              description: Funding rounds recorded.
+          required:
+          - total
+          - total_vc
+          - rounds_count
+          description: Funding raised; null when no round is recorded.
+        valuation:
+          type:
+          - object
+          - 'null'
+          properties:
+            value:
+              type:
+              - number
+              - 'null'
+              description: Latest valuation, active currency.
+            year:
+              type:
+              - number
+              - 'null'
+              description: Year the valuation was recorded.
+            month:
+              type:
+              - number
+              - 'null'
+              description: Month (1-12); null when unknown.
+          required:
+          - value
+          - year
+          - month
+          description: Most recent valuation, with the period it applies to.
+        jobs:
+          type: object
+          properties:
+            is_hiring:
+              type:
+              - boolean
+              - 'null'
+              description: Currently recruiting.
+            open_count:
+              type: number
+              description: Active job openings; 0 when none.
+          required:
+          - is_hiring
+          - open_count
+          description: Hiring status and open roles.
+      required:
+      - uuid
+      - type
+      - domain
+      - name
+      - tagline
+      - about
+      - image
+      - dealroom_url
+      - links
+      - locations
+      - roles
+      - taxonomy
+      - launch_date
+      - closing_date
+      - employees_count
+      - added_at
+      - updated_at
+      - subtype
+      - classifications
+      - employee_count_1y_growth
+      - status
+      - signal_rating
+      - unicorn_type
+      - became_unicorn_date
+      - became_thoroughbred_date
+      - exit_date
+      - investor
+      - funding
+      - valuation
+      - jobs
+      title: Company
+      description: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    GovNgoSummary:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Stable UUID of the entity; the sole public identifier.
+          example: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+        type:
+          type: string
+          enum:
+          - organization
+          description: Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`.
+        domain:
+          type:
+          - string
+          - 'null'
+          description: Registrable domain, e.g. "stripe.com".
+          example: stripe.com
+        name:
+          type: string
+          description: Display name.
+          example: Stripe
+        tagline:
+          type:
+          - string
+          - 'null'
+          description: One-line description.
+        about:
+          type:
+          - string
+          - 'null'
+          description: Long-form description.
+        image:
+          type:
+          - string
+          - 'null'
+          description: Absolute logo URL.
+        dealroom_url:
+          type:
+          - string
+          - 'null'
+          description: Canonical profile URL on app.dealroom.co.
+        links:
+          type: object
+          properties:
+            website:
+              type:
+              - string
+              - 'null'
+              description: Website URL.
+            linkedin:
+              type:
+              - string
+              - 'null'
+              description: LinkedIn profile URL.
+            twitter:
+              type:
+              - string
+              - 'null'
+              description: Twitter / X profile URL.
+            instagram:
+              type:
+              - string
+              - 'null'
+              description: Instagram URL or handle.
+            angellist:
+              type:
+              - string
+              - 'null'
+              description: AngelList URL or handle.
+            crunchbase:
+              type:
+              - string
+              - 'null'
+              description: Crunchbase profile URL.
+          required:
+          - website
+          - linkedin
+          - twitter
+          - instagram
+          - angellist
+          - crunchbase
+          description: The entity's own presence on the web; each null when unknown.
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                $ref: '#/components/schemas/LocationRole'
+              city:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: City; null when not known.
+              state:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: State or region; null when none.
+              country:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Country.
+              continent:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Continent.
+              lat:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+              lon:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+            required:
+            - role
+            - city
+            - state
+            - country
+            - continent
+            - lat
+            - lon
+          description: 'Every location: hq, founding, then offices; empty when none.'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRole'
+          description: 'Roles the organization plays: `investor`, `limited_partner`, `fund_manager`.'
+        taxonomy:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: Numeric identifier of the tag.
+              name:
+                type: string
+                description: Display name of the tag.
+              type:
+                $ref: '#/components/schemas/TagType'
+            required:
+            - id
+            - name
+            - type
+          description: Taxonomy terms (industries, sectors, technologies, …); empty when none.
+        launch_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the organization was founded, at source precision.
+        closing_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the organization closed; null while active.
+        employees_count:
+          type:
+          - number
+          - 'null'
+          description: Number of employees.
+        added_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the organization was added to Dealroom (RFC 3339).
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the record was last modified (RFC 3339).
+        subtype:
+          type: string
+          enum:
+          - gov_ngo
+          description: Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons.
+        classifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Classification'
+          description: Dealroom labels; empty when none.
+        signal_rating:
+          type:
+          - number
+          - 'null'
+          description: Dealroom Signal rating (0-100).
+        investor:
+          type:
+          - object
+          - 'null'
+          properties:
+            types:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Investor types; empty when none.
+            stages:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Stages invested in; empty when none.
+            deal_size:
+              type:
+              - object
+              - 'null'
+              properties:
+                min:
+                  type:
+                  - number
+                  - 'null'
+                  description: Smallest ticket, active currency.
+                max:
+                  type:
+                  - number
+                  - 'null'
+                  description: Largest ticket, active currency.
+              required:
+              - min
+              - max
+              description: Ticket size range; null when unknown.
+            investments:
+              type: object
+              properties:
+                count:
+                  type:
+                  - number
+                  - 'null'
+                  description: Investments made.
+                total_invested:
+                  type:
+                  - number
+                  - 'null'
+                  description: Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency.
+                preferred_round:
+                  type:
+                  - string
+                  - 'null'
+                  description: Most frequent round stage, e.g. `series_a`.
+                last_round_date:
+                  anyOf:
+                  - $ref: '#/components/schemas/PartialDate'
+                  - type: 'null'
+                  description: Date of the most recent investment round, at source precision.
+              required:
+              - count
+              - total_invested
+              - preferred_round
+              - last_round_date
+              description: Investment activity.
+          required:
+          - types
+          - stages
+          - deal_size
+          - investments
+          description: The organization's investing profile; null unless it invests.
+        funding:
+          type:
+          - object
+          - 'null'
+          properties:
+            total:
+              type:
+              - number
+              - 'null'
+              description: Total raised, active currency.
+            total_vc:
+              type:
+              - number
+              - 'null'
+              description: VC-only share of `total`.
+            rounds_count:
+              type:
+              - number
+              - 'null'
+              description: Funding rounds recorded.
+          required:
+          - total
+          - total_vc
+          - rounds_count
+          description: Funding raised; null when no round is recorded.
+        jobs:
+          type: object
+          properties:
+            is_hiring:
+              type:
+              - boolean
+              - 'null'
+              description: Currently recruiting.
+            open_count:
+              type: number
+              description: Active job openings; 0 when none.
+          required:
+          - is_hiring
+          - open_count
+          description: Hiring status and open roles.
+      required:
+      - uuid
+      - type
+      - domain
+      - name
+      - tagline
+      - about
+      - image
+      - dealroom_url
+      - links
+      - locations
+      - roles
+      - taxonomy
+      - launch_date
+      - closing_date
+      - employees_count
+      - added_at
+      - updated_at
+      - subtype
+      - classifications
+      - signal_rating
+      - investor
+      - funding
+      - jobs
+      title: Government & NGO
+      description: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    PersonListResponseFull:
+      type: object
+      properties:
+        view:
+          type: string
+          enum:
+          - full
+          description: 'The view served: full rows.'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Person'
+        page:
+          type: object
+          properties:
+            total:
+              type:
+              - number
+              - 'null'
+            limit:
+              type: number
+            offset:
+              type: number
+            next_cursor:
+              type:
+              - string
+              - 'null'
+              description: Opaque cursor for the next page. Null when no further pages exist.
+            prev_cursor:
+              type:
+              - string
+              - 'null'
+              description: Opaque cursor for the previous page. Null when on the first page.
+          required:
+          - total
+          - limit
+          - offset
+          - next_cursor
+          - prev_cursor
+        currency:
+          type: string
+          description: Currency the person monetary fields are expressed in (default USD).
+          example: EUR
+      required:
+      - view
+      - data
+      - page
+      - currency
+      title: People — full rows
+    PersonEducationItem:
+      type: object
+      properties:
+        degree:
+          type:
+          - object
+          - 'null'
+          properties:
+            id:
+              type: number
+              description: Numeric id.
+            name:
+              type: string
+              description: Display name.
+          required:
+          - id
+          - name
+          description: Degree obtained, when known.
+        majors:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: Numeric id.
+              name:
+                type: string
+                description: Display name.
+            required:
+            - id
+            - name
+          description: Fields of study.
+        start_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the studies started.
+        end_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the studies ended.
+        university:
+          $ref: '#/components/schemas/OrganizationSummary'
+      required:
+      - degree
+      - majors
+      - start_date
+      - end_date
+      - university
+    Classification:
+      type: string
+      enum:
+      - startup
+      - colt
+      - titan
+      - rising_star
+      - spinout
+      - thoroughbred
+      - unicorn
+      - vc_backed
+      - funded
+      - exited
+      - pe_owned
+      - serial_founder
+      - super_founder
+      - promising_founder
+      - strong_founder
+      description: A Dealroom label. New values are added without a version change, so a client must tolerate a value it does not recognise.
+    PersonDetailResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Person'
+        currency:
+          type: string
+          description: Currency the person monetary fields are expressed in (default USD).
+          example: EUR
+      required:
+      - data
+      - currency
+    EntityRole:
+      type: string
+      enum:
+      - founder
+      - executive
+      - partner
+      - investor
+      - limited_partner
+      - fund_manager
+      description: 'A role the entity plays: person roles (founder, executive, partner, investor) and organization roles (investor, limited_partner, fund_manager).'
+    PersonFullBlock:
+      type: string
+      enum:
+      - founded_companies
+      - career
+      - education
+      - portfolio
+      - exits
+      - match
+      description: A full-only block of a person row, as `available[]` lists it.
+    PersonListResponse:
+      oneOf:
+      - $ref: '#/components/schemas/PersonListResponseFull'
+      - $ref: '#/components/schemas/PersonListResponseSummary'
+      discriminator:
+        propertyName: view
+        mapping:
+          full: '#/components/schemas/PersonListResponseFull'
+          summary: '#/components/schemas/PersonListResponseSummary'
+      description: 'People: full rows by default, summary rows with `view=summary`.'
+      type: object
+    OrganizationSummary:
+      oneOf:
+      - $ref: '#/components/schemas/CompanySummary'
+      - $ref: '#/components/schemas/UniversitySummary'
+      - $ref: '#/components/schemas/GovNgoSummary'
+      - $ref: '#/components/schemas/InvestorSummary'
+      discriminator:
+        propertyName: subtype
+        mapping:
+          company: '#/components/schemas/CompanySummary'
+          university: '#/components/schemas/UniversitySummary'
+          gov_ngo: '#/components/schemas/GovNgoSummary'
+          investor: '#/components/schemas/InvestorSummary'
+      title: Organization
+      description: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+      type: object
+    PersonSummary:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Stable UUID of the entity; the sole public identifier.
+          example: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+        type:
+          type: string
+          enum:
+          - person
+          description: Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`.
+        subtype:
+          type: 'null'
+          description: Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons.
+          example: null
+        name:
+          type: string
+          description: Display name.
+          example: Patrick Collison
+        tagline:
+          type:
+          - string
+          - 'null'
+          description: One-line description.
+        about:
+          type:
+          - string
+          - 'null'
+          description: Long-form description.
+        image:
+          type:
+          - string
+          - 'null'
+          description: Absolute profile image URL.
+        dealroom_url:
+          type:
+          - string
+          - 'null'
+          description: Canonical profile URL on app.dealroom.co.
+        links:
+          type: object
+          properties:
+            linkedin:
+              type:
+              - string
+              - 'null'
+              description: LinkedIn profile URL.
+            twitter:
+              type:
+              - string
+              - 'null'
+              description: Twitter / X profile URL.
+            angellist:
+              type:
+              - string
+              - 'null'
+              description: AngelList URL or handle.
+            crunchbase:
+              type:
+              - string
+              - 'null'
+              description: Crunchbase profile URL.
+          required:
+          - linkedin
+          - twitter
+          - angellist
+          - crunchbase
+          description: The person's own presence on the web; each null when unknown.
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                $ref: '#/components/schemas/LocationRole'
+              city:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: City; null when not known.
+              state:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: State or region; null when none.
+              country:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Country.
+              continent:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Continent.
+              lat:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+              lon:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+            required:
+            - role
+            - city
+            - state
+            - country
+            - continent
+            - lat
+            - lon
+          description: Where the person is based; empty when unknown.
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRole'
+          description: 'Roles the person plays: `founder`, `executive`, `partner`, `investor`.'
+        classifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Classification'
+          description: Dealroom founder labels; empty when none.
+        taxonomy:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: Numeric identifier of the tag.
+              name:
+                type: string
+                description: Display name of the tag.
+              type:
+                $ref: '#/components/schemas/TagType'
+            required:
+            - id
+            - name
+            - type
+          description: Taxonomy terms, backgrounds included; empty when none.
+        gender:
+          anyOf:
+          - $ref: '#/components/schemas/Gender'
+          - type: 'null'
+          description: Gender of the person.
+        signal_rating:
+          type:
+          - number
+          - 'null'
+          description: Dealroom founder Signal rating (0-100).
+        investor:
+          type:
+          - object
+          - 'null'
+          properties:
+            types:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Investor types; empty when none.
+            stages:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Stages invested in; empty when none.
+            deal_size:
+              type:
+              - object
+              - 'null'
+              properties:
+                min:
+                  type:
+                  - number
+                  - 'null'
+                  description: Smallest ticket, active currency.
+                max:
+                  type:
+                  - number
+                  - 'null'
+                  description: Largest ticket, active currency.
+              required:
+              - min
+              - max
+              description: Ticket size range; null when unknown.
+            investments:
+              type: object
+              properties:
+                count:
+                  type:
+                  - number
+                  - 'null'
+                  description: Investments made.
+                total_invested:
+                  type:
+                  - number
+                  - 'null'
+                  description: Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency.
+                preferred_round:
+                  type:
+                  - string
+                  - 'null'
+                  description: Most frequent round stage, e.g. `series_a`.
+                last_round_date:
+                  anyOf:
+                  - $ref: '#/components/schemas/PartialDate'
+                  - type: 'null'
+                  description: Date of the most recent investment round, at source precision.
+              required:
+              - count
+              - total_invested
+              - preferred_round
+              - last_round_date
+              description: Investment activity.
+          required:
+          - types
+          - stages
+          - deal_size
+          - investments
+          description: The person's investing profile; null unless they invest.
+        added_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the organization was added to Dealroom (RFC 3339).
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the record was last modified (RFC 3339).
+      required:
+      - uuid
+      - type
+      - subtype
+      - name
+      - tagline
+      - about
+      - image
+      - dealroom_url
+      - links
+      - locations
+      - roles
+      - classifications
+      - taxonomy
+      - gender
+      - signal_rating
+      - investor
+      - added_at
+      - updated_at
+      title: Person
+      description: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    LocationRole:
+      type: string
+      enum:
+      - hq
+      - founding
+      - office
+      description: '`hq`, `founding` or `office`. An entity has at most one `hq` and one `founding` location, and any number of offices.'
+    PersonCareerItem:
+      type: object
+      properties:
+        raw_title:
+          type:
+          - string
+          - 'null'
+          description: Job title as recorded.
+        titles:
+          type: array
+          items:
+            type: string
+          description: Normalized job titles.
+        is_founder:
+          type: boolean
+          description: Founded the organization.
+        is_executive:
+          type: boolean
+          description: Holds an executive role there.
+        is_partner:
+          type: boolean
+          description: Holds a partner role there.
+        is_past:
+          type: boolean
+          description: Every role there has ended.
+        start_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the first role there started, at source precision.
+        end_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the last role there ended; null while any is current.
+        company:
+          $ref: '#/components/schemas/OrganizationSummary'
+      required:
+      - raw_title
+      - titles
+      - is_founder
+      - is_executive
+      - is_partner
+      - is_past
+      - start_date
+      - end_date
+      - company
+    InvestorSummary:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Stable UUID of the entity; the sole public identifier.
+          example: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+        type:
+          type: string
+          enum:
+          - organization
+          description: Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`.
+        domain:
+          type:
+          - string
+          - 'null'
+          description: Registrable domain, e.g. "stripe.com".
+          example: stripe.com
+        name:
+          type: string
+          description: Display name.
+          example: Stripe
+        tagline:
+          type:
+          - string
+          - 'null'
+          description: One-line description.
+        about:
+          type:
+          - string
+          - 'null'
+          description: Long-form description.
+        image:
+          type:
+          - string
+          - 'null'
+          description: Absolute logo URL.
+        dealroom_url:
+          type:
+          - string
+          - 'null'
+          description: Canonical profile URL on app.dealroom.co.
+        links:
+          type: object
+          properties:
+            website:
+              type:
+              - string
+              - 'null'
+              description: Website URL.
+            linkedin:
+              type:
+              - string
+              - 'null'
+              description: LinkedIn profile URL.
+            twitter:
+              type:
+              - string
+              - 'null'
+              description: Twitter / X profile URL.
+            instagram:
+              type:
+              - string
+              - 'null'
+              description: Instagram URL or handle.
+            angellist:
+              type:
+              - string
+              - 'null'
+              description: AngelList URL or handle.
+            crunchbase:
+              type:
+              - string
+              - 'null'
+              description: Crunchbase profile URL.
+          required:
+          - website
+          - linkedin
+          - twitter
+          - instagram
+          - angellist
+          - crunchbase
+          description: The entity's own presence on the web; each null when unknown.
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                $ref: '#/components/schemas/LocationRole'
+              city:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: City; null when not known.
+              state:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: State or region; null when none.
+              country:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Country.
+              continent:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Continent.
+              lat:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+              lon:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+            required:
+            - role
+            - city
+            - state
+            - country
+            - continent
+            - lat
+            - lon
+          description: 'Every location: hq, founding, then offices; empty when none.'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRole'
+          description: 'Roles the organization plays: `investor`, `limited_partner`, `fund_manager`.'
+        taxonomy:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: Numeric identifier of the tag.
+              name:
+                type: string
+                description: Display name of the tag.
+              type:
+                $ref: '#/components/schemas/TagType'
+            required:
+            - id
+            - name
+            - type
+          description: Taxonomy terms (industries, sectors, technologies, …); empty when none.
+        launch_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the organization was founded, at source precision.
+        closing_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the organization closed; null while active.
+        employees_count:
+          type:
+          - number
+          - 'null'
+          description: Number of employees.
+        added_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the organization was added to Dealroom (RFC 3339).
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the record was last modified (RFC 3339).
+        subtype:
+          type: string
+          enum:
+          - investor
+          description: Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons.
+        signal_rating:
+          type:
+          - number
+          - 'null'
+          description: Dealroom Signal rating (0-100).
+        types:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: Tag id.
+              name:
+                type: string
+                description: Display name.
+              code:
+                type: string
+                description: Machine-readable code.
+            required:
+            - id
+            - name
+            - code
+          description: Investor types; empty when none.
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: Tag id.
+              name:
+                type: string
+                description: Display name.
+              code:
+                type: string
+                description: Machine-readable code.
+            required:
+            - id
+            - name
+            - code
+          description: Stages invested in; empty when none.
+        deal_size:
+          type:
+          - object
+          - 'null'
+          properties:
+            min:
+              type:
+              - number
+              - 'null'
+              description: Smallest ticket, active currency.
+            max:
+              type:
+              - number
+              - 'null'
+              description: Largest ticket, active currency.
+          required:
+          - min
+          - max
+          description: Ticket size range; null when unknown.
+        investments:
+          type: object
+          properties:
+            count:
+              type:
+              - number
+              - 'null'
+              description: Investments made.
+            total_invested:
+              type:
+              - number
+              - 'null'
+              description: Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency.
+            preferred_round:
+              type:
+              - string
+              - 'null'
+              description: Most frequent round stage, e.g. `series_a`.
+            last_round_date:
+              anyOf:
+              - $ref: '#/components/schemas/PartialDate'
+              - type: 'null'
+              description: Date of the most recent investment round, at source precision.
+          required:
+          - count
+          - total_invested
+          - preferred_round
+          - last_round_date
+          description: Investment activity.
+        investor:
+          type: 'null'
+          description: 'Always null: an investor''s profile is flat at the root.'
+      required:
+      - uuid
+      - type
+      - domain
+      - name
+      - tagline
+      - about
+      - image
+      - dealroom_url
+      - links
+      - locations
+      - roles
+      - taxonomy
+      - launch_date
+      - closing_date
+      - employees_count
+      - added_at
+      - updated_at
+      - subtype
+      - signal_rating
+      - types
+      - stages
+      - deal_size
+      - investments
+      - investor
+      title: Investor firm
+      description: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+    Person:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Stable UUID of the entity; the sole public identifier.
+          example: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+        type:
+          type: string
+          enum:
+          - person
+          description: Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`.
+        subtype:
+          type: 'null'
+          description: Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons.
+          example: null
+        name:
+          type: string
+          description: Display name.
+          example: Patrick Collison
+        tagline:
+          type:
+          - string
+          - 'null'
+          description: One-line description.
+        about:
+          type:
+          - string
+          - 'null'
+          description: Long-form description.
+        image:
+          type:
+          - string
+          - 'null'
+          description: Absolute profile image URL.
+        dealroom_url:
+          type:
+          - string
+          - 'null'
+          description: Canonical profile URL on app.dealroom.co.
+        links:
+          type: object
+          properties:
+            linkedin:
+              type:
+              - string
+              - 'null'
+              description: LinkedIn profile URL.
+            twitter:
+              type:
+              - string
+              - 'null'
+              description: Twitter / X profile URL.
+            angellist:
+              type:
+              - string
+              - 'null'
+              description: AngelList URL or handle.
+            crunchbase:
+              type:
+              - string
+              - 'null'
+              description: Crunchbase profile URL.
+          required:
+          - linkedin
+          - twitter
+          - angellist
+          - crunchbase
+          description: The person's own presence on the web; each null when unknown.
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                $ref: '#/components/schemas/LocationRole'
+              city:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: City; null when not known.
+              state:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: State or region; null when none.
+              country:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Country.
+              continent:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Continent.
+              lat:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+              lon:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+            required:
+            - role
+            - city
+            - state
+            - country
+            - continent
+            - lat
+            - lon
+          description: Where the person is based; empty when unknown.
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRole'
+          description: 'Roles the person plays: `founder`, `executive`, `partner`, `investor`.'
+        classifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Classification'
+          description: Dealroom founder labels; empty when none.
+        taxonomy:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: Numeric identifier of the tag.
+              name:
+                type: string
+                description: Display name of the tag.
+              type:
+                $ref: '#/components/schemas/TagType'
+            required:
+            - id
+            - name
+            - type
+          description: Taxonomy terms, backgrounds included; empty when none.
+        gender:
+          anyOf:
+          - $ref: '#/components/schemas/Gender'
+          - type: 'null'
+          description: Gender of the person.
+        signal_rating:
+          type:
+          - number
+          - 'null'
+          description: Dealroom founder Signal rating (0-100).
+        investor:
+          type:
+          - object
+          - 'null'
+          properties:
+            rank:
+              type:
+              - number
+              - 'null'
+              description: Dealroom investor ranking (1 = top). Full view only.
+            types:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Investor types; empty when none.
+            stages:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Stages invested in; empty when none.
+            deal_size:
+              type:
+              - object
+              - 'null'
+              properties:
+                min:
+                  type:
+                  - number
+                  - 'null'
+                  description: Smallest ticket, active currency.
+                max:
+                  type:
+                  - number
+                  - 'null'
+                  description: Largest ticket, active currency.
+              required:
+              - min
+              - max
+              description: Ticket size range; null when unknown.
+            investments:
+              type: object
+              properties:
+                count:
+                  type:
+                  - number
+                  - 'null'
+                  description: Investments made.
+                total_invested:
+                  type:
+                  - number
+                  - 'null'
+                  description: Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency.
+                preferred_round:
+                  type:
+                  - string
+                  - 'null'
+                  description: Most frequent round stage, e.g. `series_a`.
+                last_round_date:
+                  anyOf:
+                  - $ref: '#/components/schemas/PartialDate'
+                  - type: 'null'
+                  description: Date of the most recent investment round, at source precision.
+              required:
+              - count
+              - total_invested
+              - preferred_round
+              - last_round_date
+              description: Investment activity.
+            portfolio:
+              type:
+              - object
+              - 'null'
+              properties:
+                rounds_count:
+                  type:
+                  - number
+                  - 'null'
+                  description: Funding rounds taken part in.
+                total_valuation:
+                  type:
+                  - number
+                  - 'null'
+                  description: Combined latest valuation of the companies backed, active currency.
+                companies:
+                  type: object
+                  properties:
+                    total:
+                      type: integer
+                      description: How many exist in total, including those `items` leaves out.
+                    sort:
+                      type: string
+                      enum:
+                      - -last_round_date
+                      description: The order of `items`, in the sub-resource's `sort` syntax.
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          is_lead:
+                            type: boolean
+                            description: Led at least one of these rounds.
+                          rounds_count:
+                            type: integer
+                            description: Rounds taken part in.
+                          last_round_date:
+                            anyOf:
+                            - $ref: '#/components/schemas/PartialDate'
+                            - type: 'null'
+                            description: Date of the most recent of those rounds, at source precision.
+                          company:
+                            $ref: '#/components/schemas/EntityRef'
+                        required:
+                        - is_lead
+                        - rounds_count
+                        - last_round_date
+                        - company
+                      description: 'A capped preview: the first items in `sort` order. When it holds fewer than `total`, page the full list from the sub-resource named above.'
+                  required:
+                  - total
+                  - sort
+                  - items
+                  description: 'Companies backed: the first 10 of `/investors/{id}/portfolio`.'
+              required:
+              - rounds_count
+              - total_valuation
+              - companies
+              description: Companies backed; detail on the `/portfolio` sub-resource. Full view only.
+            exits:
+              type:
+              - object
+              - 'null'
+              properties:
+                count:
+                  type:
+                  - number
+                  - 'null'
+                  description: Portfolio companies that exited.
+                total_value:
+                  type:
+                  - number
+                  - 'null'
+                  description: Combined exit value, active currency.
+                pct:
+                  type:
+                  - number
+                  - 'null'
+                  description: Share of the portfolio that exited, %.
+              required:
+              - count
+              - total_value
+              - pct
+              description: Portfolio exits. Full view only.
+            match:
+              type:
+              - object
+              - 'null'
+              properties:
+                companies_count:
+                  type:
+                  - number
+                  - 'null'
+                  description: Portfolio companies matching the request's portfolio filters.
+                invested:
+                  type:
+                  - number
+                  - 'null'
+                  description: Invested in those companies, active currency.
+              required:
+              - companies_count
+              - invested
+              description: Portfolio companies matching the request's `portfolio_count_*` filters; null when the request carries none. Full view only.
+          required:
+          - rank
+          - types
+          - stages
+          - deal_size
+          - investments
+          - portfolio
+          - exits
+          - match
+          description: The person's investing profile; null unless they invest.
+        founded_companies:
+          type:
+          - object
+          - 'null'
+          properties:
+            count:
+              type:
+              - number
+              - 'null'
+              description: Companies the person founded.
+            total_funding:
+              type:
+              - number
+              - 'null'
+              description: Combined funding of the companies founded, active currency.
+          required:
+          - count
+          - total_funding
+          description: Companies the person founded. Full view only.
+        career:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: How many exist in total, including those `items` leaves out.
+            sort:
+              type: string
+              enum:
+              - -is_founder,is_past,-start_date
+              description: The order of `items`, in the sub-resource's `sort` syntax.
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  raw_title:
+                    type:
+                    - string
+                    - 'null'
+                    description: Job title as recorded.
+                  titles:
+                    type: array
+                    items:
+                      type: string
+                    description: Normalized job titles.
+                  is_founder:
+                    type: boolean
+                    description: Founded the organization.
+                  is_executive:
+                    type: boolean
+                    description: Holds an executive role there.
+                  is_partner:
+                    type: boolean
+                    description: Holds a partner role there.
+                  is_past:
+                    type: boolean
+                    description: Every role there has ended.
+                  start_date:
+                    anyOf:
+                    - $ref: '#/components/schemas/PartialDate'
+                    - type: 'null'
+                    description: When the first role there started, at source precision.
+                  end_date:
+                    anyOf:
+                    - $ref: '#/components/schemas/PartialDate'
+                    - type: 'null'
+                    description: When the last role there ended; null while any is current.
+                  company:
+                    $ref: '#/components/schemas/EntityRef'
+                required:
+                - raw_title
+                - titles
+                - is_founder
+                - is_executive
+                - is_partner
+                - is_past
+                - start_date
+                - end_date
+                - company
+              description: 'A capped preview: the first items in `sort` order. When it holds fewer than `total`, page the full list from the sub-resource named above.'
+          required:
+          - total
+          - sort
+          - items
+          description: 'Organizations the person is or was part of: the first 5 of `/people/{id}/career`, founding roles first, then current ones.'
+        education:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: How many exist in total, including those `items` leaves out.
+            sort:
+              type: string
+              enum:
+              - -start_date
+              description: The order of `items`, in the sub-resource's `sort` syntax.
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  degree:
+                    type:
+                    - object
+                    - 'null'
+                    properties:
+                      id:
+                        type: number
+                        description: Numeric id.
+                      name:
+                        type: string
+                        description: Display name.
+                    required:
+                    - id
+                    - name
+                    description: Degree obtained, when known.
+                  majors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: Numeric id.
+                        name:
+                          type: string
+                          description: Display name.
+                      required:
+                      - id
+                      - name
+                    description: Fields of study.
+                  start_date:
+                    anyOf:
+                    - $ref: '#/components/schemas/PartialDate'
+                    - type: 'null'
+                    description: When the studies started.
+                  end_date:
+                    anyOf:
+                    - $ref: '#/components/schemas/PartialDate'
+                    - type: 'null'
+                    description: When the studies ended.
+                  university:
+                    $ref: '#/components/schemas/EntityRef'
+                required:
+                - degree
+                - majors
+                - start_date
+                - end_date
+                - university
+              description: 'A capped preview: the first items in `sort` order. When it holds fewer than `total`, page the full list from the sub-resource named above.'
+          required:
+          - total
+          - sort
+          - items
+          description: 'Education records: the first 5 of `/people/{id}/education`, most recent first.'
+        available:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonFullBlock'
+          description: Full-only blocks that hold data for this row, listed even when the caller's tier withholds them.
+        added_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the organization was added to Dealroom (RFC 3339).
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the record was last modified (RFC 3339).
+      required:
+      - uuid
+      - type
+      - subtype
+      - name
+      - tagline
+      - about
+      - image
+      - dealroom_url
+      - links
+      - locations
+      - roles
+      - classifications
+      - taxonomy
+      - gender
+      - signal_rating
+      - investor
+      - founded_companies
+      - career
+      - education
+      - available
+      - added_at
+      - updated_at
+      title: Person
+    EntityRef:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Stable UUID of the entity.
+        type:
+          $ref: '#/components/schemas/EntityType'
+        subtype:
+          anyOf:
+          - $ref: '#/components/schemas/OrganizationSubtype'
+          - type: 'null'
+          description: Organization subtype; always null for a person.
+        name:
+          type: string
+          description: Display name.
+        image:
+          type:
+          - string
+          - 'null'
+          description: Absolute image URL; null when none.
+        dealroom_url:
+          type:
+          - string
+          - 'null'
+          description: Canonical profile URL on app.dealroom.co.
+      required:
+      - uuid
+      - type
+      - subtype
+      - name
+      - image
+      - dealroom_url
+      description: 'The identity of an entity embedded in another entity''s response. Closed: richer detail lives on the sub-resource, where tier redaction can reach it.'
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - VALIDATION_ERROR
+              - NOT_FOUND
+              - UNAUTHORIZED
+              - DATABASE_ERROR
+              - UNKNOWN_FILTER
+              - FILTER_VALIDATION_ERROR
+              - UNSUPPORTED_OPERATOR
+              - FILTER_PARSE_ERROR
+              - QUERY_TIMEOUT
+              - INTERNAL_SERVER_ERROR
+              - INVALID_ENTITY_ID
+              - PAGINATION_DEPTH_EXCEEDED
+              - SCHEMA_ERROR
+              - FORBIDDEN
+              - EXTERNAL_SERVICE_ERROR
+              - ACCOUNT_REQUIRED
+              - INSTANCE_ACCESS_REQUIRED
+              - SERVICE_UNAVAILABLE
+              - RATE_LIMITED
+              - CREDITS_EXHAUSTED
+              - LIST_LOCKED
+              - PATH_RENAMED
+              - ENDPOINT_REMOVED
+              description: Stable machine-readable error code.
+            message:
+              type: string
+            details:
+              anyOf:
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                    message:
+                      type: string
+                  required:
+                  - path
+                  - message
+              - type: object
+                additionalProperties:
+                  anyOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+              - type: 'null'
+          required:
+          - code
+          - message
+          - details
+      required:
+      - error
+    CompanyStatus:
+      type: string
+      enum:
+      - operational
+      - acquired
+      - closed
+      - low_activity
+      description: Operational status of a company.
+    PartialDate:
+      type: string
+      pattern: ^\d{4}(-\d{2}(-\d{2})?)?$
+      description: 'A date at the precision the source knows it. The value''s length is its precision: `YYYY` when only the year is known, `YYYY-MM` for the month, `YYYY-MM-DD` for the day. Never padded: an unknown month or day shortens the value rather than defaulting to `01`. Deliberately not `format: date`, which requires a full day.'
+      example: 2024-03
+    OrganizationSubtype:
+      type: string
+      enum:
+      - company
+      - university
+      - gov_ngo
+      - investor
+      description: 'The kind of organization: company, university, gov_ngo or investor.'
+    TagType:
+      type: string
+      enum:
+      - sector
+      - technology
+      - industry
+      - sub_industry
+      - business_model
+      - income_stream
+      - client_focus
+      - sdg
+      - ownership
+      - techstack_category
+      - deal_structure
+      - growth_stage
+      - investor_type
+      - background
+      description: Category of a tag (e.g. industry, sector, technology).
+    EntityType:
+      type: string
+      enum:
+      - organization
+      - person
+      description: 'Top-level entity type: `organization` or `person`.'
+    PersonListResponseSummary:
+      type: object
+      properties:
+        view:
+          type: string
+          enum:
+          - summary
+          description: 'The view served: summary rows.'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonSummary'
+        page:
+          type: object
+          properties:
+            total:
+              type:
+              - number
+              - 'null'
+            limit:
+              type: number
+            offset:
+              type: number
+            next_cursor:
+              type:
+              - string
+              - 'null'
+              description: Opaque cursor for the next page. Null when no further pages exist.
+            prev_cursor:
+              type:
+              - string
+              - 'null'
+              description: Opaque cursor for the previous page. Null when on the first page.
+          required:
+          - total
+          - limit
+          - offset
+          - next_cursor
+          - prev_cursor
+        currency:
+          type: string
+          description: Currency the person monetary fields are expressed in (default USD).
+          example: EUR
+      required:
+      - view
+      - data
+      - page
+      - currency
+      title: People — summary rows
+    Gender:
+      type: string
+      enum:
+      - male
+      - female
+      - non_binary
+      - prefer_not_to_say
+      description: Gender of a person.
+    UniversitySummary:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Stable UUID of the entity; the sole public identifier.
+          example: 345d1ab6-33df-4759-9e17-0d0c0ec9ab1c
+        type:
+          type: string
+          enum:
+          - organization
+          description: Top-level entity type — exactly one of `organization` or `person`. For organizations, `subtype` carries the specific kind (company / university / gov_ngo / investor). Persons always have a null `subtype`.
+        domain:
+          type:
+          - string
+          - 'null'
+          description: Registrable domain, e.g. "stripe.com".
+          example: stripe.com
+        name:
+          type: string
+          description: Display name.
+          example: Stripe
+        tagline:
+          type:
+          - string
+          - 'null'
+          description: One-line description.
+        about:
+          type:
+          - string
+          - 'null'
+          description: Long-form description.
+        image:
+          type:
+          - string
+          - 'null'
+          description: Absolute logo URL.
+        dealroom_url:
+          type:
+          - string
+          - 'null'
+          description: Canonical profile URL on app.dealroom.co.
+        links:
+          type: object
+          properties:
+            website:
+              type:
+              - string
+              - 'null'
+              description: Website URL.
+            linkedin:
+              type:
+              - string
+              - 'null'
+              description: LinkedIn profile URL.
+            twitter:
+              type:
+              - string
+              - 'null'
+              description: Twitter / X profile URL.
+            instagram:
+              type:
+              - string
+              - 'null'
+              description: Instagram URL or handle.
+            angellist:
+              type:
+              - string
+              - 'null'
+              description: AngelList URL or handle.
+            crunchbase:
+              type:
+              - string
+              - 'null'
+              description: Crunchbase profile URL.
+          required:
+          - website
+          - linkedin
+          - twitter
+          - instagram
+          - angellist
+          - crunchbase
+          description: The entity's own presence on the web; each null when unknown.
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                $ref: '#/components/schemas/LocationRole'
+              city:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: City; null when not known.
+              state:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: State or region; null when none.
+              country:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Country.
+              continent:
+                type:
+                - object
+                - 'null'
+                properties:
+                  id:
+                    type: number
+                    description: Location id, as accepted by the location filters.
+                  name:
+                    type: string
+                    description: Location name.
+                required:
+                - id
+                - name
+                description: Continent.
+              lat:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+              lon:
+                type:
+                - number
+                - 'null'
+                description: Entity coordinates when known, otherwise the city centroid.
+            required:
+            - role
+            - city
+            - state
+            - country
+            - continent
+            - lat
+            - lon
+          description: 'Every location: hq, founding, then offices; empty when none.'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRole'
+          description: 'Roles the organization plays: `investor`, `limited_partner`, `fund_manager`.'
+        taxonomy:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: Numeric identifier of the tag.
+              name:
+                type: string
+                description: Display name of the tag.
+              type:
+                $ref: '#/components/schemas/TagType'
+            required:
+            - id
+            - name
+            - type
+          description: Taxonomy terms (industries, sectors, technologies, …); empty when none.
+        launch_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the organization was founded, at source precision.
+        closing_date:
+          anyOf:
+          - $ref: '#/components/schemas/PartialDate'
+          - type: 'null'
+          description: When the organization closed; null while active.
+        employees_count:
+          type:
+          - number
+          - 'null'
+          description: Number of employees.
+        added_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the organization was added to Dealroom (RFC 3339).
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the record was last modified (RFC 3339).
+        subtype:
+          type: string
+          enum:
+          - university
+          description: Organization subtype — one of `company`, `university`, `gov_ngo`, `investor`. Mutually exclusive. Always null for persons.
+        spinouts_count:
+          type:
+          - number
+          - 'null'
+          description: Spinout companies originating from the university.
+        investor:
+          type:
+          - object
+          - 'null'
+          properties:
+            types:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Investor types; empty when none.
+            stages:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: Tag id.
+                  name:
+                    type: string
+                    description: Display name.
+                  code:
+                    type: string
+                    description: Machine-readable code.
+                required:
+                - id
+                - name
+                - code
+              description: Stages invested in; empty when none.
+            deal_size:
+              type:
+              - object
+              - 'null'
+              properties:
+                min:
+                  type:
+                  - number
+                  - 'null'
+                  description: Smallest ticket, active currency.
+                max:
+                  type:
+                  - number
+                  - 'null'
+                  description: Largest ticket, active currency.
+              required:
+              - min
+              - max
+              description: Ticket size range; null when unknown.
+            investments:
+              type: object
+              properties:
+                count:
+                  type:
+                  - number
+                  - 'null'
+                  description: Investments made.
+                total_invested:
+                  type:
+                  - number
+                  - 'null'
+                  description: Total size of the funding rounds the investor participated in (the full round amounts, not the investor's own ticket), active currency.
+                preferred_round:
+                  type:
+                  - string
+                  - 'null'
+                  description: Most frequent round stage, e.g. `series_a`.
+                last_round_date:
+                  anyOf:
+                  - $ref: '#/components/schemas/PartialDate'
+                  - type: 'null'
+                  description: Date of the most recent investment round, at source precision.
+              required:
+              - count
+              - total_invested
+              - preferred_round
+              - last_round_date
+              description: Investment activity.
+          required:
+          - types
+          - stages
+          - deal_size
+          - investments
+          description: The organization's investing profile; null unless it invests.
+      required:
+      - uuid
+      - type
+      - domain
+      - name
+      - tagline
+      - about
+      - image
+      - dealroom_url
+      - links
+      - locations
+      - roles
+      - taxonomy
+      - launch_date
+      - closing_date
+      - employees_count
+      - added_at
+      - updated_at
+      - subtype
+      - spinouts_count
+      - investor
+      title: University
+      description: 'An entity as it appears on another row: its type''s row without the full-only blocks.'
+  headers:
+    Sunset:
+      description: 'Present when the request pinned a superseded version: the date the version stops working and requests begin returning `400` (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+    X-Credits-Used:
+      description: Credits this request consumed, under the current credit schedule. Present on every response to an API-key request under `/data`, `/analytics` and `/reference`; `0` on an error response or a free endpoint. Absent when the request was not authenticated with an API key (so never on a `401`), or on unmetered endpoints. During open beta credits are drawn from the team's balance but not billed.
+      schema:
+        type: integer
+        minimum: 0
+      example: 25
+    Deprecation:
+      description: 'Present when the request pinned a superseded version: the date that version was deprecated (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+  parameters:
+    ApiVersion:
+      name: API-Version
+      in: header
+      required: false
+      schema:
+        type: string
+        format: date
+        example: '2026-10-09'
+      description: Pin a Stripe-style date-based API version (`YYYY-MM-DD`). Omit to use the latest version (`2026-10-09`). A pinned version is supported for 30 days after it is superseded, after which it returns `400`.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 JWT access token. Paste a token obtained from your preferred OAuth2 flow. For machine-to-machine use, the OAuth2 client_credentials scheme below can mint a token directly from your `client_id` / `client_secret` inside the Swagger UI Authorize dialog.
+    oauth2:
+      type: oauth2
+      description: OAuth2 client-credentials flow against the Dealroom Auth0 tenant. Use the `client_id` / `client_secret` from a Programmatic API key. Tokens are valid for 24h — Swagger UI will reuse the same token across operations. Revoking or deactivating a key rejects it on the next request (within a ≤5-minute server-side cache window), not at token expiry.
+      flows:
+        clientCredentials:
+          tokenUrl: https://accounts.dealroom.co/oauth/token
+          scopes:
+            read:entities: Grant the read:entities permission
+            read:transactions: Grant the read:transactions permission
+            read:valuations: Grant the read:valuations permission
+            read:investors: Grant the read:investors permission
+            read:founders: Grant the read:founders permission
+            read:dimensions: Grant the read:dimensions permission
+            read:timeseries: Grant the read:timeseries permission
+            read:aggregate: Grant the read:aggregate permission
+            read:news: Grant the read:news permission
+            read:jobs: Grant the read:jobs permission
+            read:people: Grant the read:people permission
+            read:search: Grant the read:search permission
+x-tagGroups:
+- name: Data
+  tags:
+  - Entities
+  - Companies
+  - Universities
+  - Government & NGO
+  - Transactions
+  - Valuations
+  - Investors
+  - Funds
+  - People
+  - Founders
+  - News
+  - Jobs
+  - Search
+- name: Analytics
+  tags:
+  - Aggregate
+  - Timeseries
+- name: Reference
+  tags:
+  - Discovery
+  - Filters
+x-public-contract: true

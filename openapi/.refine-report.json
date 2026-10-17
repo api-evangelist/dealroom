@@ -1,0 +1,37 @@
+{
+  "provider": "dealroom",
+  "sources": [
+    "_original/dealroom-api-openapi.yml"
+  ],
+  "outputs": [
+    "dealroom-aggregate-api-openapi.yml",
+    "dealroom-companies-api-openapi.yml",
+    "dealroom-discovery-api-openapi.yml",
+    "dealroom-entities-api-openapi.yml",
+    "dealroom-filters-api-openapi.yml",
+    "dealroom-founders-api-openapi.yml",
+    "dealroom-funds-api-openapi.yml",
+    "dealroom-government-ngo-api-openapi.yml",
+    "dealroom-health-api-openapi.yml",
+    "dealroom-investors-api-openapi.yml",
+    "dealroom-jobs-api-openapi.yml",
+    "dealroom-news-api-openapi.yml",
+    "dealroom-notes-api-openapi.yml",
+    "dealroom-people-api-openapi.yml",
+    "dealroom-search-api-openapi.yml",
+    "dealroom-timeseries-api-openapi.yml",
+    "dealroom-transactions-api-openapi.yml",
+    "dealroom-universities-api-openapi.yml",
+    "dealroom-valuations-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "dealroom-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "dealroom-api-openapi.yml: declared missing tag: Notes",
+    "apis.yml register: written (+19 apis, 20 total)"
+  ],
+  "skipped": []
+}

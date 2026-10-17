@@ -84,18 +84,437 @@ apis:
   humanURL: https://developers.dealroom.co
   baseURL: https://api.dealroom.app
   aid: dealroom:dealroom-api
-- aid: dealroom:dealroom-api-api
-  name: Dealroom API API
-  description: 'REST API for the Dealroom platform — companies, funds, founders, investors, funding rounds, valuations, taxonomy, news, and aggregate
-
-    analytics across all of them. Authentication uses Auth0 (Bearer JWT or OAuth2 client_credentials). All endpoints are versioned via the `API-Version`
-
-    header (Stripe-st'
-  humanURL: https://developers.dealroom.co/llms.txt
+- aid: dealroom:dealroom-aggregate-api
+  name: Dealroom Aggregate API
+  description: >-
+    Composable single- and multi-metric aggregations across companies, universities, government bodies
+    and NGOs, funding rounds, valuations, founders, investors, and entities of every type.
+  humanURL: https://developers.dealroom.co
   baseURL: https://api.dealroom.app
+  tags:
+  - Aggregate
   properties:
   - type: OpenAPI
-    url: openapi/_original/dealroom-api-openapi.yml
+    url: openapi/dealroom-aggregate-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-companies-api
+  name: Dealroom Companies API
+  description: >-
+    Company profiles — the `organization_subtype = company` subset of entities (excludes investors, universities,
+    and gov/NGOs). Same response shape as the entity index, scoped to companies.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Companies
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-companies-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-discovery-api
+  name: Dealroom Discovery API
+  description: API root discovery and functional namespaces.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Discovery
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-discovery-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-entities-api
+  name: Dealroom Entities API
+  description: >-
+    Companies, investors, people, universities, and other organisations. Filter, sort, and paginate the
+    unified entity index. The term `investor` refers to the investment firm; `fund` refers to the capital
+    vehicle it raises.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Entities
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-entities-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-filters-api
+  name: Dealroom Filters API
+  description: >-
+    Filter registry discovery and value lookup. Use `/reference/filters` to discover available filters
+    per scope and `/reference/filters/:key/values` to look up valid values.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Filters
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-filters-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-founders-api
+  name: Dealroom Founders API
+  description: >-
+    Founder profiles with company associations and education history. Subset of entities where `is_founder
+    = true`.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Founders
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-founders-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-funds-api
+  name: Dealroom Funds API
+  description: >-
+    Funds — the capital vehicles investor firms raise (e.g. "Fund III", $200M, 2024). Browse/filter by
+    manager, type, size, and vintage; each fund links to its manager (GP). Fund size (`amount`) converts
+    to the requested `?currency=` (default USD); `amount_source` carries the original native-currency
+    amount.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Funds
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-funds-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-government-ngo-api
+  name: Dealroom Government & NGO API
+  description: Government bodies and NGOs — the `organization_subtype = gov_ngo` subset of entities.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Government & NGO
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-government-ngo-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-health-api
+  name: Dealroom Health API
+  description: Liveness probe (public, unauthenticated).
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Health
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-health-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-investors-api
+  name: Dealroom Investors API
+  description: >-
+    Investor profiles (VCs, corporates, angels, family offices, governments). Subset of entities where
+    `is_investor = true`. An investor is the firm that makes investments; the capital vehicles it raises
+    are funds available via `/investors/{id}/funds`.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Investors
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-investors-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-jobs-api
+  name: Dealroom Jobs API
+  description: Active job openings posted by companies, with hiring-trend signals.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Jobs
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-jobs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-news-api
+  name: Dealroom News API
+  description: Curated news articles about companies, funds, deals, sectors, and events.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - News
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-news-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-notes-api
+  name: Dealroom Notes API
+  description: The Notes API from Dealroom — 2 operation(s) for notes.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Notes
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-notes-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-people-api
+  name: Dealroom People API
+  description: >-
+    Person profiles (founders, executives, angels, and others). Subset of entities where `entity_type
+    = 'person'`. Same response shape as founders, with company associations, education, and tags.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - People
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-people-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-search-api
+  name: Dealroom Search API
+  description: >-
+    Cross-resource fuzzy search across companies, investors, people, universities, and government & NGO
+    bodies.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Search
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-search-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-transactions-api
+  name: Dealroom Transactions API
+  description: >-
+    Funding rounds, equity events, debt, grants, exits, and other company-level financial events.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Transactions
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-transactions-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-universities-api
+  name: Dealroom Universities API
+  description: >-
+    University profiles — the `organization_subtype = university` subset of entities. The `university`
+    sub-object carries alumni metrics.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Universities
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-universities-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-valuations-api
+  name: Dealroom Valuations API
+  description: Company valuation history, by `valued_date`.
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Valuations
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-valuations-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/dealroom-filters-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-filter-values-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-funds-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-search-response-schema.json
+  - type: JSONSchema
+    url: json-schema/dealroom-entity-investments-response-schema.json
+- aid: dealroom:dealroom-time-series-api
+  name: Dealroom Time Series API
+  description: Yearly entity metrics (employees, revenue, valuation).
+  humanURL: https://developers.dealroom.co
+  baseURL: https://api.dealroom.app
+  tags:
+  - Time Series
+  properties:
+  - type: OpenAPI
+    url: openapi/dealroom-time-series-api-openapi.yml
   - type: JSONSchema
     url: json-schema/dealroom-filters-response-schema.json
   - type: JSONSchema

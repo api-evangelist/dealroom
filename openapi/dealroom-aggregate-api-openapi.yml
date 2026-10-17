@@ -1,0 +1,858 @@
+openapi: 3.2.0
+info:
+  title: Dealroom Aggregate API
+  version: '2026-10-09'
+  description: REST API for the Dealroom platform — companies, funds, founders, investors, funding rounds, valuations, taxonomy, news, and aggregate analytics across all of them. Authentication uses Auth0 (Bearer JWT or OAuth2 client_credentials). All endpoints are versioned via the `API-Version` header (Stripe-style date-based versioning).
+  contact:
+    name: Dealroom API support
+    email: support@dealroom.co
+    url: https://dealroom.co
+  termsOfService: https://dealroom.co/terms
+  license:
+    name: Proprietary — Dealroom commercial license
+    url: https://dealroom.co/terms
+servers:
+- url: https://api.dealroom.app
+  description: Production
+security:
+- bearerAuth: []
+- oauth2: []
+tags:
+- name: Aggregate
+  description: Composable single- and multi-metric aggregations across companies, universities, government bodies and NGOs, funding rounds, valuations, founders, investors, and entities of every type.
+paths:
+  /analytics/aggregate/{source}:
+    get:
+      operationId: sourceAggregate
+      security:
+      - oauth2:
+        - read:aggregate
+      - bearerAuth:
+        - read:aggregate
+      tags:
+      - Aggregate
+      summary: Aggregate by source
+      description: 'Query a specific source (founders, investors, companies, universities, gov-ngo, funding-rounds, valuations, entities) with structured filter syntax.
+
+
+        **Filter syntax** (`filter` param):
+
+        - Single filter: `filter=key[op]:value`
+
+        - AND: `filter=and(key1[op]:val1,key2[op]:val2)`
+
+        - OR: `filter=or(key1[op]:val1,key2[op]:val2)`
+
+        - Nested: `filter=and(taxonomy_id[eq]:42,or(hq_location[eq]:81,hq_location[eq]:74))`
+
+
+        **Available operators:** `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in_any`, `nin_any`, `in_all`, `nin_all`
+
+        `in_all` / `nin_all` work on repeated related-record filters and on the `classification` / `roles` flag sets.
+
+
+        **Filter types:**
+
+        - Direct: `launch_year[gte]:2020`, `total_funding[gt]:1000000`, `classification[in_any]:unicorn`
+
+        - Location: `hq_location[eq]:81`, `hq_location[in_any]:1234|5678` (also `founding_location`, `office_location`, `founding_or_hq_location`)
+
+        - Tag: `taxonomy_id[eq]:42`, `taxonomy_id[nin_any]:99`
+
+        - Region: `region[eq]:123`
+
+
+        **Examples:**
+
+        - Count by country with tag: `?metric=count&group_by=hq_country&filter=taxonomy_id[eq]:42`
+
+        - Funded startups by year: `?metric=count&group_by=launch_year&filter=and(classification[in_any]:funded,launch_year[gte]:2015)`
+
+        - Multi-dim: `?metric=sum:amount&group_by=year,hq_country`'
+      parameters:
+      - schema:
+          type: string
+          enum:
+          - founders
+          - investors
+          - companies
+          - funding-rounds
+          - valuations
+          - entities
+          - universities
+          - gov-ngo
+          description: The source to aggregate (founders, investors, companies, universities, gov-ngo, funding-rounds, valuations, entities)
+          example: founders
+        required: true
+        description: The source to aggregate (founders, investors, companies, universities, gov-ngo, funding-rounds, valuations, entities)
+        name: source
+        in: path
+      - schema:
+          type: string
+          description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+          example: EUR
+        required: false
+        description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+        name: currency
+        in: query
+      - schema:
+          type: string
+          minLength: 1
+          description: 'Metric to compute: count, count_distinct:field, sum:field, avg:field, median:field, p25:field, p75:field'
+          example: count
+        required: true
+        description: 'Metric to compute: count, count_distinct:field, sum:field, avg:field, median:field, p25:field, p75:field'
+        name: metric
+        in: query
+      - schema:
+          type: string
+          minLength: 1
+          pattern: ^[a-z][a-z0-9_.]*(?:,[a-z][a-z0-9_.]*)*$
+          description: 'Dimension(s) to group by, at most 4. Location dims: hq_country, hq_city, hq_state, hq_continent, macro_region, region. Ecosystem map areas: map_area — the startup-map choropleth dimension (counts per polygon; requires an active ecosystem, else a validation error). Pair it with the per-entity map dots at GET /data/{companies|investors|universities}/geo. Relationship fields: university.name, employer.city. Multi-dim: year,hq_country'
+          example: hq_country
+        required: true
+        description: 'Dimension(s) to group by, at most 4. Location dims: hq_country, hq_city, hq_state, hq_continent, macro_region, region. Ecosystem map areas: map_area — the startup-map choropleth dimension (counts per polygon; requires an active ecosystem, else a validation error). Pair it with the per-entity map dots at GET /data/{companies|investors|universities}/geo. Relationship fields: university.name, employer.city. Multi-dim: year,hq_country'
+        name: group_by
+        in: query
+      - schema:
+          type: string
+          description: 'Filter expression using structured syntax: and(key[op]:value,...), or(...). Example: and(taxonomy_id[eq]:42,hq_location[eq]:81)'
+          example: and(taxonomy_id[eq]:42,launch_year[gte]:2020)
+        required: false
+        description: 'Filter expression using structured syntax: and(key[op]:value,...), or(...). Example: and(taxonomy_id[eq]:42,hq_location[eq]:81)'
+        name: filter
+        in: query
+      - schema:
+          type: string
+          pattern: ^-?[a-z][a-z0-9_]*$
+          description: Sort by metric key or 'dimension'. Prefix with - for descending
+          example: -count
+        required: false
+        description: Sort by metric key or 'dimension'. Prefix with - for descending
+        name: sort
+        in: query
+      - schema:
+          type: string
+          description: Number of results to return (1-500, default 25)
+          example: '25'
+        required: false
+        description: Number of results to return (1-500, default 25)
+        name: limit
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Aggregated results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregateResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '400':
+          description: Invalid request parameters, filter, metric or group_by (e.g. more dimensions than the cap)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: The request was malformed or failed validation.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '402':
+          description: '`CREDITS_EXHAUSTED` — the caller''s team has no credits left, or none granted yet. Only API-key and MCP requests are capped.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+        '503':
+          description: '`SERVICE_UNAVAILABLE` — the caller''s team credits could not be checked. Retry shortly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: SERVICE_UNAVAILABLE
+                  message: The service is temporarily unavailable.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+  /analytics/aggregate/{source}/multi-metric:
+    get:
+      operationId: multiMetric
+      security:
+      - oauth2:
+        - read:aggregate
+      - bearerAuth:
+        - read:aggregate
+      tags:
+      - Aggregate
+      summary: Multi-metric aggregate
+      description: 'Return multiple labeled metrics from a single SQL query, each with optional per-metric
+
+        filters using aggregate FILTER (WHERE ...) clauses. Supports all metric types (COUNT, SUM,
+
+        AVG, MEDIAN, MAX) and optional dimensional grouping (group_by).
+
+
+        **Metric param format:** `metric=,`
+
+        - First segment = label (lowercase alphanumeric + underscore)
+
+        - Second segment = metric type (e.g., `count`, `sum:total_funding`, `percentage:label_a/label_b`)
+
+
+        **Percentage metrics** (`percentage:numerator/denominator`): Computes `ROUND(numerator * 100.0 / NULLIF(denominator, 0), 2)`.
+
+        - Both referenced labels must be defined as non-percentage metrics in the same request.
+
+        - Percentage metrics cannot have per-metric filters (apply filters to the referenced metrics instead).
+
+        - Example: `metric=filtered,count&metric=total,count&metric=pct,percentage:filtered/total`
+
+
+        **Per-metric filters** (`metric_filter` param): `metric_filter=:`
+
+        - Uses the same AST filter syntax as the shared `filter` param
+
+        - Example: `metric_filter=unicorns:classification[in_any]:unicorn`
+
+        - Compound: `metric_filter=funded:and(total_funding[gte]:100000,classification[in_any]:vc_backed)`
+
+
+        **group_by** (optional): Dimension(s) to group by, comma-separated.
+
+        **sort** (optional): Sort by metric label or `dimension`. Prefix `-` for descending (default).
+
+        **limit** (optional): Max results when grouped (1-500, default 25).
+
+
+        **Post-aggregation filter** (`metric_having` param): Filter grouped rows by metric values.
+
+        - Format: `metric_having=[op]:` where op is gt, gte, lt, lte, eq, neq
+
+        - Repeatable for multiple conditions (AND semantics)
+
+        - Only valid when `group_by` is present
+
+        - Example: `metric_having=percentage[gt]:25&metric_having=filtered[gte]:5`
+
+
+        **Shared filters** (`filter` param): Uses structured AST syntax, same as `/analytics/aggregate/:source`.
+
+        - Single filter: `filter=taxonomy_id[eq]:42`
+
+        - AND: `filter=and(taxonomy_id[eq]:42,launch_year[gte]:2020)`
+
+        - OR: `filter=or(hq_location[eq]:133,hq_location[eq]:75)`
+
+
+        **Example — mixed metrics with group_by:**
+
+        ```
+
+        GET /analytics/aggregate/companies/multi-metric
+
+
+        ?metric=total,count
+
+        &metric=unicorns,count
+
+        &metric=unicorn_funding,sum:total_funding
+
+        &metric_filter=unicorns:classification[in_any]:unicorn
+
+        &metric_filter=unicorn_funding:classification[in_any]:unicorn
+
+        &group_by=hq_country
+
+        &sort=-total
+
+        &limit=10
+
+        &filter=launch_year[gte]:2015
+
+        ```
+
+
+        **Example — flat (no group_by):**
+
+        ```
+
+        GET /analytics/aggregate/companies/multi-metric
+
+
+        ?metric=total,count
+
+        &metric=unicorns,count
+
+        &metric=unicorn_funding,sum:total_funding
+
+        &metric_filter=unicorns:classification[in_any]:unicorn
+
+        &metric_filter=unicorn_funding:classification[in_any]:unicorn
+
+        ```
+
+        Returns: `{ data: [{ total: 52341, unicorns: 1287, unicorn_funding: 3400000000000 }], query_info: { source: "companies", metrics: [...] } }` — note that `data` is a single-element array even for the flat (no-group_by) variant, for shape consistency with the grouped response.'
+      parameters:
+      - schema:
+          type: string
+          enum:
+          - founders
+          - investors
+          - companies
+          - funding-rounds
+          - valuations
+          - entities
+          - universities
+          - gov-ngo
+          description: The source to aggregate
+          example: companies
+        required: true
+        description: The source to aggregate
+        name: source
+        in: path
+      - schema:
+          type: string
+          description: ISO 4217 currency code for monetary metric conversion. Defaults to USD.
+          example: EUR
+        required: false
+        description: ISO 4217 currency code for monetary metric conversion. Defaults to USD.
+        name: currency
+        in: query
+      - schema:
+          anyOf:
+          - type: string
+            minLength: 1
+          - type: array
+            items:
+              type: string
+              minLength: 1
+            minItems: 1
+          description: 'Metric definition: label,metric_type. Repeat for multiple metrics. Types: count, count_distinct:field, sum:field, avg:field, median:field, p25:field, p75:field, percentage:numerator_label/denominator_label. Example: metric=total,count&metric=unicorns,count&metric=pct,percentage:unicorns/total'
+          example: total,count
+        required: true
+        description: 'Metric definition: label,metric_type. Repeat for multiple metrics. Types: count, count_distinct:field, sum:field, avg:field, median:field, p25:field, p75:field, percentage:numerator_label/denominator_label. Example: metric=total,count&metric=unicorns,count&metric=pct,percentage:unicorns/total'
+        name: metric
+        in: query
+        example: total,count
+      - schema:
+          anyOf:
+          - type: string
+            minLength: 1
+          - type: array
+            items:
+              type: string
+              minLength: 1
+            minItems: 1
+          description: 'Per-metric filter expression: <label>:<filter_expression>. Example: metric_filter=unicorns:classification[in_any]:unicorn'
+          example: unicorns:classification[in_any]:unicorn
+        required: false
+        description: 'Per-metric filter expression: <label>:<filter_expression>. Example: metric_filter=unicorns:classification[in_any]:unicorn'
+        name: metric_filter
+        in: query
+      - schema:
+          anyOf:
+          - type: string
+            minLength: 1
+          - type: array
+            items:
+              type: string
+              minLength: 1
+            minItems: 1
+          description: 'Post-aggregation filter: <label>[op]:<value>. Operators: gt, gte, lt, lte, eq, neq. Only valid with group_by. Example: metric_having=percentage[gt]:25'
+          example: percentage[gt]:25
+        required: false
+        description: 'Post-aggregation filter: <label>[op]:<value>. Operators: gt, gte, lt, lte, eq, neq. Only valid with group_by. Example: metric_having=percentage[gt]:25'
+        name: metric_having
+        in: query
+      - schema:
+          type: string
+          minLength: 1
+          pattern: ^[a-z][a-z0-9_.]*(?:,[a-z][a-z0-9_.]*)*$
+          description: Dimension(s) to group by, comma-separated, at most 4. Omit for flat aggregation. Includes map_area — the startup-map choropleth dimension (requires an active ecosystem); its per-entity dots counterpart is GET /data/{companies|investors|universities}/geo.
+          example: hq_country
+        required: false
+        description: Dimension(s) to group by, comma-separated, at most 4. Omit for flat aggregation. Includes map_area — the startup-map choropleth dimension (requires an active ecosystem); its per-entity dots counterpart is GET /data/{companies|investors|universities}/geo.
+        name: group_by
+        in: query
+        example: hq_country
+      - schema:
+          type: string
+          description: 'Filter expression: and(key[op]:value,...), or(...). Example: and(taxonomy_id[eq]:42,launch_year[gte]:2020)'
+          example: and(taxonomy_id[eq]:42,launch_year[gte]:2020)
+        required: false
+        description: 'Filter expression: and(key[op]:value,...), or(...). Example: and(taxonomy_id[eq]:42,launch_year[gte]:2020)'
+        name: filter
+        in: query
+      - schema:
+          type: string
+          pattern: ^-?[a-z][a-z0-9_]*$
+          description: Sort by metric label or 'dimension'. Prefix with - for descending
+          example: -total
+        required: false
+        description: Sort by metric label or 'dimension'. Prefix with - for descending
+        name: sort
+        in: query
+        example: -total
+      - schema:
+          type: string
+          description: Number of results to return (1-500, default 25)
+          example: '25'
+        required: false
+        description: Number of results to return (1-500, default 25)
+        name: limit
+        in: query
+        example: '25'
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Multi-metric results (grouped or flat depending on group_by)
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/MultiMetricGroupedResponse'
+                - $ref: '#/components/schemas/MultiMetricFlatResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '400':
+          description: Invalid request parameters, filter, metric or group_by (e.g. more dimensions than the cap)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: The request was malformed or failed validation.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '402':
+          description: '`CREDITS_EXHAUSTED` — the caller''s team has no credits left, or none granted yet. Only API-key and MCP requests are capped.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+        '503':
+          description: '`SERVICE_UNAVAILABLE` — the caller''s team credits could not be checked. Retry shortly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: SERVICE_UNAVAILABLE
+                  message: The service is temporarily unavailable.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+components:
+  schemas:
+    AggregateResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              anyOf:
+              - type: string
+              - type: number
+              - type: 'null'
+        query_info:
+          type: object
+          properties:
+            source:
+              type: string
+            group_by:
+              type: string
+            metric:
+              type: string
+            groups_count:
+              type: number
+          required:
+          - source
+          - group_by
+          - metric
+          - groups_count
+        currency:
+          type: string
+      required:
+      - data
+      - query_info
+      - currency
+    MultiMetricFlatResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type:
+              - number
+              - 'null'
+        query_info:
+          type: object
+          properties:
+            source:
+              type: string
+            metrics:
+              type: array
+              items:
+                type: object
+                properties:
+                  label:
+                    type: string
+                  type:
+                    type: string
+                required:
+                - label
+                - type
+          required:
+          - source
+          - metrics
+        currency:
+          type: string
+      required:
+      - data
+      - query_info
+      - currency
+      title: Totals (no grouping)
+    MultiMetricGroupedResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              anyOf:
+              - type: string
+              - type: number
+              - type: 'null'
+        query_info:
+          type: object
+          properties:
+            source:
+              type: string
+            group_by:
+              type: string
+            metrics:
+              type: array
+              items:
+                type: object
+                properties:
+                  label:
+                    type: string
+                  type:
+                    type: string
+                required:
+                - label
+                - type
+            groups_count:
+              type: number
+          required:
+          - source
+          - group_by
+          - metrics
+          - groups_count
+        currency:
+          type: string
+      required:
+      - data
+      - query_info
+      - currency
+      title: Grouped by dimension
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - VALIDATION_ERROR
+              - NOT_FOUND
+              - UNAUTHORIZED
+              - DATABASE_ERROR
+              - UNKNOWN_FILTER
+              - FILTER_VALIDATION_ERROR
+              - UNSUPPORTED_OPERATOR
+              - FILTER_PARSE_ERROR
+              - QUERY_TIMEOUT
+              - INTERNAL_SERVER_ERROR
+              - INVALID_ENTITY_ID
+              - PAGINATION_DEPTH_EXCEEDED
+              - SCHEMA_ERROR
+              - FORBIDDEN
+              - EXTERNAL_SERVICE_ERROR
+              - ACCOUNT_REQUIRED
+              - INSTANCE_ACCESS_REQUIRED
+              - SERVICE_UNAVAILABLE
+              - RATE_LIMITED
+              - CREDITS_EXHAUSTED
+              - LIST_LOCKED
+              - PATH_RENAMED
+              - ENDPOINT_REMOVED
+              description: Stable machine-readable error code.
+            message:
+              type: string
+            details:
+              anyOf:
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                    message:
+                      type: string
+                  required:
+                  - path
+                  - message
+              - type: object
+                additionalProperties:
+                  anyOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+              - type: 'null'
+          required:
+          - code
+          - message
+          - details
+      required:
+      - error
+  headers:
+    Sunset:
+      description: 'Present when the request pinned a superseded version: the date the version stops working and requests begin returning `400` (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+    X-Credits-Used:
+      description: Credits this request consumed, under the current credit schedule. Present on every response to an API-key request under `/data`, `/analytics` and `/reference`; `0` on an error response or a free endpoint. Absent when the request was not authenticated with an API key (so never on a `401`), or on unmetered endpoints. During open beta credits are drawn from the team's balance but not billed.
+      schema:
+        type: integer
+        minimum: 0
+      example: 25
+    Deprecation:
+      description: 'Present when the request pinned a superseded version: the date that version was deprecated (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+  parameters:
+    ApiVersion:
+      name: API-Version
+      in: header
+      required: false
+      schema:
+        type: string
+        format: date
+        example: '2026-10-09'
+      description: Pin a Stripe-style date-based API version (`YYYY-MM-DD`). Omit to use the latest version (`2026-10-09`). A pinned version is supported for 30 days after it is superseded, after which it returns `400`.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 JWT access token. Paste a token obtained from your preferred OAuth2 flow. For machine-to-machine use, the OAuth2 client_credentials scheme below can mint a token directly from your `client_id` / `client_secret` inside the Swagger UI Authorize dialog.
+    oauth2:
+      type: oauth2
+      description: OAuth2 client-credentials flow against the Dealroom Auth0 tenant. Use the `client_id` / `client_secret` from a Programmatic API key. Tokens are valid for 24h — Swagger UI will reuse the same token across operations. Revoking or deactivating a key rejects it on the next request (within a ≤5-minute server-side cache window), not at token expiry.
+      flows:
+        clientCredentials:
+          tokenUrl: https://accounts.dealroom.co/oauth/token
+          scopes:
+            read:entities: Grant the read:entities permission
+            read:transactions: Grant the read:transactions permission
+            read:valuations: Grant the read:valuations permission
+            read:investors: Grant the read:investors permission
+            read:founders: Grant the read:founders permission
+            read:dimensions: Grant the read:dimensions permission
+            read:timeseries: Grant the read:timeseries permission
+            read:aggregate: Grant the read:aggregate permission
+            read:news: Grant the read:news permission
+            read:jobs: Grant the read:jobs permission
+            read:people: Grant the read:people permission
+            read:search: Grant the read:search permission
+x-tagGroups:
+- name: Data
+  tags:
+  - Entities
+  - Companies
+  - Universities
+  - Government & NGO
+  - Transactions
+  - Valuations
+  - Investors
+  - Funds
+  - People
+  - Founders
+  - News
+  - Jobs
+  - Search
+- name: Analytics
+  tags:
+  - Aggregate
+  - Timeseries
+- name: Reference
+  tags:
+  - Discovery
+  - Filters
+x-public-contract: true

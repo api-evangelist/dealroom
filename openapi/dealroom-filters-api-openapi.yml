@@ -1,0 +1,976 @@
+openapi: 3.2.0
+info:
+  title: Dealroom Filters API
+  version: '2026-10-09'
+  description: REST API for the Dealroom platform — companies, funds, founders, investors, funding rounds, valuations, taxonomy, news, and aggregate analytics across all of them. Authentication uses Auth0 (Bearer JWT or OAuth2 client_credentials). All endpoints are versioned via the `API-Version` header (Stripe-style date-based versioning).
+  contact:
+    name: Dealroom API support
+    email: support@dealroom.co
+    url: https://dealroom.co
+  termsOfService: https://dealroom.co/terms
+  license:
+    name: Proprietary — Dealroom commercial license
+    url: https://dealroom.co/terms
+servers:
+- url: https://api.dealroom.app
+  description: Production
+security:
+- bearerAuth: []
+- oauth2: []
+tags:
+- name: Filters
+  description: Filter registry discovery and value lookup. Use `/reference/filters` to discover available filters per scope and `/reference/filters/:key/values` to look up valid values.
+paths:
+  /reference/filters:
+    get:
+      operationId: filters
+      security:
+      - oauth2:
+        - read:dimensions
+      - bearerAuth:
+        - read:dimensions
+      tags:
+      - Filters
+      summary: List filters
+      description: 'Returns available filters for the given scope with category grouping, operators, and optional user-facing descriptions and examples. Valid scopes: companies, investors, transactions, people, universities, gov_ngo, news, jobs, funds.'
+      parameters:
+      - schema:
+          type: string
+          enum:
+          - companies
+          - investors
+          - transactions
+          - people
+          - universities
+          - gov_ngo
+          - news
+          - jobs
+          - funds
+          description: 'Required. One of: companies, investors, transactions, people, universities, gov_ngo, news, jobs, funds'
+          example: companies
+        required: true
+        description: 'Required. One of: companies, investors, transactions, people, universities, gov_ngo, news, jobs, funds'
+        name: scope
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Available filters with category metadata
+          content:
+            application/json:
+              example:
+                data:
+                - key: taxonomy_id
+                  label: Tags
+                  description: Find companies by sector, industry, technology, or other tags.
+                  description_long: Use tags to narrow companies by Dealroom's taxonomy. Combine multiple tag IDs with multi-value operators.
+                  examples:
+                  - value: 42
+                    label: Fintech
+                  - value: 123
+                    label: Climate
+                  type: id_lookup
+                  category: Sectors
+                  operators:
+                  - eq
+                  - neq
+                  - in_any
+                  - in_all
+                  - nin_any
+                  - nin_all
+                  supports_type_filter: true
+                  sub_types:
+                  - key: industry
+                    label: Industries
+                  - key: technology
+                    label: Technologies
+                  - key: sector
+                    label: Sectors
+                - key: launch_date
+                  label: Founded Year
+                  type: date
+                  category: Company Info
+                  operators:
+                  - gte
+                  - lte
+                  - between
+                - key: classification
+                  label: Labels
+                  type: enum
+                  category: Labels
+                  operators:
+                  - eq
+                  - neq
+                  - in_any
+                  - in_all
+                  - nin_any
+                  - nin_all
+              schema:
+                $ref: '#/components/schemas/FiltersResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+  /reference/filters/search:
+    get:
+      operationId: filterSearch
+      security:
+      - oauth2:
+        - read:dimensions
+      - bearerAuth:
+        - read:dimensions
+      tags:
+      - Filters
+      summary: Search filters and values
+      description: 'Returns the picker-ready search result set for one scope: year-intent matches, value matches across every searchable dimension, and filter-name/description matches. Single round-trip replacement for the client-side fan-out across `/reference/filters/:key/values`.'
+      parameters:
+      - schema:
+          type: string
+          enum:
+          - companies
+          - investors
+          - transactions
+          - people
+          - universities
+          - gov_ngo
+          - news
+          - jobs
+          - funds
+          description: 'Required. One of: companies, investors, transactions, people, universities, gov_ngo, news, jobs, funds'
+          example: companies
+        required: true
+        description: 'Required. One of: companies, investors, transactions, people, universities, gov_ngo, news, jobs, funds'
+        name: scope
+        in: query
+      - schema:
+          type: string
+          minLength: 1
+          description: Search query (min 1 char). Filter labels and year heuristics are matched immediately; value lookup starts at 3 chars.
+          example: fintech
+        required: true
+        description: Search query (min 1 char). Filter labels and year heuristics are matched immediately; value lookup starts at 3 chars.
+        name: q
+        in: query
+      - schema:
+          type: string
+          description: Max value matches per picker row (1-10, default 3)
+          example: '3'
+        required: false
+        description: Max value matches per picker row (1-10, default 3)
+        name: limit_per_row
+        in: query
+      - schema:
+          type: string
+          description: Total result cap (1-50, default 20)
+          example: '20'
+        required: false
+        description: Total result cap (1-50, default 20)
+        name: limit
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Search matches in tier-and-row order
+          content:
+            application/json:
+              example:
+                data:
+                - kind: value
+                  filter_key: taxonomy_id
+                  filter_picker_key: taxonomy_id:industry
+                  filter_label: Industries
+                  pinned_sub_type: industry
+                  label: Fintech
+                  value: '42'
+                  entities_count: 1200
+                  source_type: industry
+                - kind: year
+                  filter_key: launch_date
+                  filter_picker_key: launch_date
+                  filter_label: Founded Year
+                  label: 'Founded Year: After 2020'
+                  value: '2020'
+                  operator: gte
+                - kind: filter
+                  filter_key: taxonomy_id
+                  filter_picker_key: taxonomy_id:sector
+                  filter_label: Sectors
+                  pinned_sub_type: sector
+                  category: Sectors
+              schema:
+                $ref: '#/components/schemas/FilterSearchResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+  /reference/filters/{key}/values:
+    get:
+      operationId: filterValues
+      security:
+      - oauth2:
+        - read:dimensions
+      - bearerAuth:
+        - read:dimensions
+      tags:
+      - Filters
+      summary: List filter values
+      description: Returns values for a filter with entity counts. Supports fuzzy search, pagination, and optional metadata enrichment. Only filters with type id_lookup or enum have values.
+      parameters:
+      - schema:
+          type: string
+          example: taxonomy_id
+        required: true
+        name: key
+        in: path
+      - schema:
+          type: string
+          minLength: 2
+          description: Fuzzy search (min 2 chars)
+          example: fintech
+        required: false
+        description: Fuzzy search (min 2 chars)
+        name: q
+        in: query
+      - schema:
+          type: string
+          minLength: 2
+          maxLength: 500
+          description: Semantic ranking phrase — ranks values by gemini-embedding-001 cosine distance instead of lexical search. Tag dimensions only; ignored elsewhere.
+          example: fintech lending
+        required: false
+        description: Semantic ranking phrase — ranks values by gemini-embedding-001 cosine distance instead of lexical search. Tag dimensions only; ignored elsewhere.
+        name: semantic
+        in: query
+      - schema:
+          type: string
+          description: Sub-type filter (e.g. industry for tags, country for locations)
+          example: industry
+        required: false
+        description: Sub-type filter (e.g. industry for tags, country for locations)
+        name: type
+        in: query
+      - schema:
+          type: string
+          description: Results per page (1-1000, default 100)
+          example: '100'
+        required: false
+        description: Results per page (1-1000, default 100)
+        name: limit
+        in: query
+      - schema:
+          type: string
+          example: '0'
+        required: false
+        name: offset
+        in: query
+      - schema:
+          type: string
+          description: 'Comma-separated enrichments: geo, description'
+          example: geo
+        required: false
+        description: 'Comma-separated enrichments: geo, description'
+        name: include
+        in: query
+      - schema:
+          type: string
+          pattern: ^[\w-]+(\|[\w-]+)*$
+          description: Pipe-separated IDs to always include
+          example: 42|123
+        required: false
+        description: Pipe-separated IDs to always include
+        name: ids
+        in: query
+      - schema:
+          type: string
+          description: Serialized filter expression (same format as entity list endpoints). When provided, entities_count reflects how many results remain with these filters applied.
+          example: hq_location[eq]:233
+        required: false
+        description: Serialized filter expression (same format as entity list endpoints). When provided, entities_count reflects how many results remain with these filters applied.
+        name: filter
+        in: query
+      - schema:
+          type: string
+          enum:
+          - companies
+          - investors
+          - transactions
+          - people
+          - universities
+          - gov_ngo
+          - news
+          - jobs
+          - funds
+          description: Filter scope (same as discovery/search). Aligns contextual entities_count with the scoped list endpoint — relationship-path keys, defaults, and baselines. Defaults to companies.
+          example: companies
+        required: false
+        description: Filter scope (same as discovery/search). Aligns contextual entities_count with the scoped list endpoint — relationship-path keys, defaults, and baselines. Defaults to companies.
+        name: scope
+        in: query
+      - schema:
+          type: boolean
+          description: Pass `true` to populate `entities_count` on each value. Default leaves it `null` to avoid the count query.
+          example: true
+        required: false
+        description: Pass `true` to populate `entities_count` on each value. Default leaves it `null` to avoid the count query.
+        name: include_counts
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Filter values with entity counts
+          content:
+            application/json:
+              example:
+                data:
+                - id: 42
+                  code: industry/fintech
+                  name: Fintech
+                  entities_count: 1200
+                  type: industry
+                - id: 87
+                  code: industry/financial-services
+                  name: Financial Services
+                  entities_count: 890
+                  type: industry
+                page:
+                  total: 2
+                  limit: 100
+                  offset: 0
+                  has_more: false
+              schema:
+                $ref: '#/components/schemas/FilterValuesResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '400':
+          description: Filter key not found or does not support value lookup, or a filter key a later API version renamed (`details.replaced_by` names it)
+          content:
+            application/json:
+              example:
+                error:
+                  code: UNKNOWN_FILTER
+                  message: 'Unknown filter: tag_id. `tag_id` was replaced by `taxonomy_id` in API version 2026-10-02 (e.g. `taxonomy_id[in_any]:42`).'
+                  details:
+                    filter: tag_id
+                    replaced_by: taxonomy_id
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+components:
+  headers:
+    Sunset:
+      description: 'Present when the request pinned a superseded version: the date the version stops working and requests begin returning `400` (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+    X-Credits-Used:
+      description: Credits this request consumed, under the current credit schedule. Present on every response to an API-key request under `/data`, `/analytics` and `/reference`; `0` on an error response or a free endpoint. Absent when the request was not authenticated with an API key (so never on a `401`), or on unmetered endpoints. During open beta credits are drawn from the team's balance but not billed.
+      schema:
+        type: integer
+        minimum: 0
+      example: 25
+    Deprecation:
+      description: 'Present when the request pinned a superseded version: the date that version was deprecated (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+  schemas:
+    FiltersResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              filter_key:
+                type: string
+              pinned_sub_type:
+                type: string
+              label:
+                type: string
+              description:
+                type: string
+              description_long:
+                type: string
+              examples:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      anyOf:
+                      - type: string
+                      - type: number
+                      - type: boolean
+                    label:
+                      type: string
+                  required:
+                  - value
+              type:
+                type: string
+                enum:
+                - id_lookup
+                - enum
+                - boolean
+                - numeric
+                - date
+                - text
+              category:
+                type: string
+              operators:
+                type: array
+                items:
+                  type: string
+              format:
+                type: string
+                enum:
+                - currency
+                - year
+                - count
+              supports_type_filter:
+                type: boolean
+              sub_types:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                    label:
+                      type: string
+                  required:
+                  - key
+                  - label
+              data_status:
+                type: object
+                properties:
+                  kind:
+                    type: string
+                    enum:
+                    - stub
+                    - data-incomplete
+                    - unloaded
+                    - partial
+                  reason:
+                    type: string
+                  gap_id:
+                    type: string
+                required:
+                - kind
+                - reason
+                - gap_id
+                description: Present only when the filter is not fully functional today. See `docs/api-gaps.md` for the full registry.
+              deprecated:
+                type: string
+                description: 'Present when the filter is deprecated: the notice explains the preferred replacement (the filter still works for now).'
+            required:
+            - key
+            - filter_key
+            - label
+            - type
+            - category
+            - operators
+      required:
+      - data
+    FilterValuesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                anyOf:
+                - type: number
+                - type: string
+              code:
+                type:
+                - string
+                - 'null'
+              name:
+                type: string
+              entities_count:
+                type:
+                - number
+                - 'null'
+                description: Number of matching entities in the requested scope. `null` unless `include_counts=true`.
+              type:
+                type: string
+              parent_name:
+                type:
+                - string
+                - 'null'
+              state_name:
+                type:
+                - string
+                - 'null'
+                description: State or region of a city location, when it has one. `parent_name` stays the country.
+              lat:
+                type:
+                - number
+                - 'null'
+              lon:
+                type:
+                - number
+                - 'null'
+              description:
+                type:
+                - string
+                - 'null'
+              image:
+                type:
+                - string
+                - 'null'
+              hq_city:
+                type:
+                - string
+                - 'null'
+              hq_country:
+                type:
+                - string
+                - 'null'
+              website_domain:
+                type:
+                - string
+                - 'null'
+            required:
+            - id
+            - code
+            - name
+            - entities_count
+        page:
+          type: object
+          properties:
+            total:
+              type: number
+              description: Row count in this response — NOT the total match count. Use `has_more` to detect a next page.
+            limit:
+              type: number
+            offset:
+              type: number
+            has_more:
+              type: boolean
+              description: Whether more values exist beyond this page (offset + limit).
+          required:
+          - total
+          - limit
+          - offset
+          - has_more
+      required:
+      - data
+      - page
+    FilterSearchResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            oneOf:
+            - type: object
+              properties:
+                kind:
+                  type: string
+                  enum:
+                  - value
+                filter_key:
+                  type: string
+                filter_picker_key:
+                  type: string
+                filter_label:
+                  type: string
+                pinned_sub_type:
+                  type: string
+                label:
+                  type: string
+                value:
+                  type: string
+                entities_count:
+                  type: number
+                source_type:
+                  type: string
+              required:
+              - kind
+              - filter_key
+              - filter_picker_key
+              - filter_label
+              - label
+              - value
+              title: Filter value
+            - type: object
+              properties:
+                kind:
+                  type: string
+                  enum:
+                  - filter
+                filter_key:
+                  type: string
+                filter_picker_key:
+                  type: string
+                filter_label:
+                  type: string
+                pinned_sub_type:
+                  type: string
+                description:
+                  type: string
+                category:
+                  type: string
+              required:
+              - kind
+              - filter_key
+              - filter_picker_key
+              - filter_label
+              - category
+              title: Filter
+            - type: object
+              properties:
+                kind:
+                  type: string
+                  enum:
+                  - year
+                filter_key:
+                  type: string
+                filter_picker_key:
+                  type: string
+                filter_label:
+                  type: string
+                pinned_sub_type:
+                  type: string
+                label:
+                  type: string
+                value:
+                  type: string
+                operator:
+                  type: string
+                  enum:
+                  - gte
+                  - lte
+                  - eq
+              required:
+              - kind
+              - filter_key
+              - filter_picker_key
+              - filter_label
+              - label
+              - value
+              - operator
+              title: Year
+      required:
+      - data
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - VALIDATION_ERROR
+              - NOT_FOUND
+              - UNAUTHORIZED
+              - DATABASE_ERROR
+              - UNKNOWN_FILTER
+              - FILTER_VALIDATION_ERROR
+              - UNSUPPORTED_OPERATOR
+              - FILTER_PARSE_ERROR
+              - QUERY_TIMEOUT
+              - INTERNAL_SERVER_ERROR
+              - INVALID_ENTITY_ID
+              - PAGINATION_DEPTH_EXCEEDED
+              - SCHEMA_ERROR
+              - FORBIDDEN
+              - EXTERNAL_SERVICE_ERROR
+              - ACCOUNT_REQUIRED
+              - INSTANCE_ACCESS_REQUIRED
+              - SERVICE_UNAVAILABLE
+              - RATE_LIMITED
+              - CREDITS_EXHAUSTED
+              - LIST_LOCKED
+              - PATH_RENAMED
+              - ENDPOINT_REMOVED
+              description: Stable machine-readable error code.
+            message:
+              type: string
+            details:
+              anyOf:
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                    message:
+                      type: string
+                  required:
+                  - path
+                  - message
+              - type: object
+                additionalProperties:
+                  anyOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+              - type: 'null'
+          required:
+          - code
+          - message
+          - details
+      required:
+      - error
+  parameters:
+    ApiVersion:
+      name: API-Version
+      in: header
+      required: false
+      schema:
+        type: string
+        format: date
+        example: '2026-10-09'
+      description: Pin a Stripe-style date-based API version (`YYYY-MM-DD`). Omit to use the latest version (`2026-10-09`). A pinned version is supported for 30 days after it is superseded, after which it returns `400`.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 JWT access token. Paste a token obtained from your preferred OAuth2 flow. For machine-to-machine use, the OAuth2 client_credentials scheme below can mint a token directly from your `client_id` / `client_secret` inside the Swagger UI Authorize dialog.
+    oauth2:
+      type: oauth2
+      description: OAuth2 client-credentials flow against the Dealroom Auth0 tenant. Use the `client_id` / `client_secret` from a Programmatic API key. Tokens are valid for 24h — Swagger UI will reuse the same token across operations. Revoking or deactivating a key rejects it on the next request (within a ≤5-minute server-side cache window), not at token expiry.
+      flows:
+        clientCredentials:
+          tokenUrl: https://accounts.dealroom.co/oauth/token
+          scopes:
+            read:entities: Grant the read:entities permission
+            read:transactions: Grant the read:transactions permission
+            read:valuations: Grant the read:valuations permission
+            read:investors: Grant the read:investors permission
+            read:founders: Grant the read:founders permission
+            read:dimensions: Grant the read:dimensions permission
+            read:timeseries: Grant the read:timeseries permission
+            read:aggregate: Grant the read:aggregate permission
+            read:news: Grant the read:news permission
+            read:jobs: Grant the read:jobs permission
+            read:people: Grant the read:people permission
+            read:search: Grant the read:search permission
+x-tagGroups:
+- name: Data
+  tags:
+  - Entities
+  - Companies
+  - Universities
+  - Government & NGO
+  - Transactions
+  - Valuations
+  - Investors
+  - Funds
+  - People
+  - Founders
+  - News
+  - Jobs
+  - Search
+- name: Analytics
+  tags:
+  - Aggregate
+  - Timeseries
+- name: Reference
+  tags:
+  - Discovery
+  - Filters
+x-public-contract: true

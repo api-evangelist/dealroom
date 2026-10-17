@@ -1,0 +1,143 @@
+openapi: 3.2.0
+info:
+  title: Dealroom Health API
+  version: '2026-10-09'
+  description: REST API for the Dealroom platform — companies, funds, founders, investors, funding rounds, valuations, taxonomy, news, and aggregate analytics across all of them. Authentication uses Auth0 (Bearer JWT or OAuth2 client_credentials). All endpoints are versioned via the `API-Version` header (Stripe-style date-based versioning).
+  contact:
+    name: Dealroom API support
+    email: support@dealroom.co
+    url: https://dealroom.co
+  termsOfService: https://dealroom.co/terms
+  license:
+    name: Proprietary — Dealroom commercial license
+    url: https://dealroom.co/terms
+servers:
+- url: https://api.dealroom.app
+  description: Production
+security:
+- bearerAuth: []
+- oauth2: []
+tags:
+- name: Health
+  description: Liveness probe (public, unauthenticated).
+paths:
+  /health:
+    get:
+      operationId: health
+      security: []
+      tags:
+      - Health
+      summary: Check API health
+      description: Public liveness probe. Returns `200` when the API can reach the database, `503` otherwise. No authentication required — safe to use from uptime monitors and load-balancer health checks.
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+      parameters:
+      - $ref: '#/components/parameters/ApiVersion'
+components:
+  headers:
+    Sunset:
+      description: 'Present when the request pinned a superseded version: the date the version stops working and requests begin returning `400` (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+    Deprecation:
+      description: 'Present when the request pinned a superseded version: the date that version was deprecated (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        database:
+          type: string
+      required:
+      - status
+      - timestamp
+      - database
+  parameters:
+    ApiVersion:
+      name: API-Version
+      in: header
+      required: false
+      schema:
+        type: string
+        format: date
+        example: '2026-10-09'
+      description: Pin a Stripe-style date-based API version (`YYYY-MM-DD`). Omit to use the latest version (`2026-10-09`). A pinned version is supported for 30 days after it is superseded, after which it returns `400`.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 JWT access token. Paste a token obtained from your preferred OAuth2 flow. For machine-to-machine use, the OAuth2 client_credentials scheme below can mint a token directly from your `client_id` / `client_secret` inside the Swagger UI Authorize dialog.
+    oauth2:
+      type: oauth2
+      description: OAuth2 client-credentials flow against the Dealroom Auth0 tenant. Use the `client_id` / `client_secret` from a Programmatic API key. Tokens are valid for 24h — Swagger UI will reuse the same token across operations. Revoking or deactivating a key rejects it on the next request (within a ≤5-minute server-side cache window), not at token expiry.
+      flows:
+        clientCredentials:
+          tokenUrl: https://accounts.dealroom.co/oauth/token
+          scopes:
+            read:entities: Grant the read:entities permission
+            read:transactions: Grant the read:transactions permission
+            read:valuations: Grant the read:valuations permission
+            read:investors: Grant the read:investors permission
+            read:founders: Grant the read:founders permission
+            read:dimensions: Grant the read:dimensions permission
+            read:timeseries: Grant the read:timeseries permission
+            read:aggregate: Grant the read:aggregate permission
+            read:news: Grant the read:news permission
+            read:jobs: Grant the read:jobs permission
+            read:people: Grant the read:people permission
+            read:search: Grant the read:search permission
+x-tagGroups:
+- name: Data
+  tags:
+  - Entities
+  - Companies
+  - Universities
+  - Government & NGO
+  - Transactions
+  - Valuations
+  - Investors
+  - Funds
+  - People
+  - Founders
+  - News
+  - Jobs
+  - Search
+- name: Analytics
+  tags:
+  - Aggregate
+  - Timeseries
+- name: Reference
+  tags:
+  - Discovery
+  - Filters
+x-public-contract: true

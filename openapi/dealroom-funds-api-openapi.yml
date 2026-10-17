@@ -1,0 +1,748 @@
+openapi: 3.2.0
+info:
+  title: Dealroom Funds API
+  version: '2026-10-09'
+  description: REST API for the Dealroom platform — companies, funds, founders, investors, funding rounds, valuations, taxonomy, news, and aggregate analytics across all of them. Authentication uses Auth0 (Bearer JWT or OAuth2 client_credentials). All endpoints are versioned via the `API-Version` header (Stripe-style date-based versioning).
+  contact:
+    name: Dealroom API support
+    email: support@dealroom.co
+    url: https://dealroom.co
+  termsOfService: https://dealroom.co/terms
+  license:
+    name: Proprietary — Dealroom commercial license
+    url: https://dealroom.co/terms
+servers:
+- url: https://api.dealroom.app
+  description: Production
+security:
+- bearerAuth: []
+- oauth2: []
+tags:
+- name: Funds
+  description: Funds — the capital vehicles investor firms raise (e.g. "Fund III", $200M, 2024). Browse/filter by manager, type, size, and vintage; each fund links to its manager (GP). Fund size (`amount`) converts to the requested `?currency=` (default USD); `amount_source` carries the original native-currency amount.
+paths:
+  /data/funds:
+    get:
+      operationId: listFunds
+      security:
+      - oauth2:
+        - read:entities
+      - bearerAuth:
+        - read:entities
+      tags:
+      - Funds
+      summary: List funds
+      description: Returns a paginated list of funds — the capital vehicles investor firms raise — newest first. Filter via the `filter` expression (`fund_type`, `is_closed`, `amount`, `year`, `investor_id`). Each fund links to its manager (GP). `amount` is the fund size in the requested `?currency=` (default USD); `amount_source` carries the original as-stored amount and its native currency.
+      parameters:
+      - schema:
+          type: string
+          description: 'Filter expression for funds (the capital vehicles investor firms raise).
+
+
+            Examples:
+
+            - Single: fund_type[eq]:Venture Capital
+
+            - AND: and(fund_type[eq]:Venture Capital,year[gte]:2020)
+
+            - OR: or(fund_type[eq]:Venture Capital,fund_type[eq]:Growth Equity)
+
+
+            Filters: fund_type, is_closed, amount (native fund size, not currency-converted),
+
+            year (vintage), investor_id (manager/GP entity UUID).
+
+            Operators: eq, neq, gt, gte, lt, lte, in_any, nin_any
+
+            Default ref: ''funds''
+
+            '
+          example: and(fund_type[eq]:Venture Capital,year[gte]:2020)
+        required: false
+        description: 'Filter expression for funds (the capital vehicles investor firms raise).
+
+
+          Examples:
+
+          - Single: fund_type[eq]:Venture Capital
+
+          - AND: and(fund_type[eq]:Venture Capital,year[gte]:2020)
+
+          - OR: or(fund_type[eq]:Venture Capital,fund_type[eq]:Growth Equity)
+
+
+          Filters: fund_type, is_closed, amount (native fund size, not currency-converted),
+
+          year (vintage), investor_id (manager/GP entity UUID).
+
+          Operators: eq, neq, gt, gte, lt, lte, in_any, nin_any
+
+          Default ref: ''funds''
+
+          '
+        name: filter
+        in: query
+      - schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 2000
+          default: 25
+          description: Number of results to return (1-2000, default 25)
+          example: 25
+        required: false
+        description: Number of results to return (1-2000, default 25)
+        name: limit
+        in: query
+      - schema:
+          type: string
+          description: Opaque cursor token from a previous response's `page.next_cursor` or `page.prev_cursor`. Round-trip it as-is — do not decode or modify.
+          example: eyJ2IjoxLCJkIjoibmV4dCJ9
+        required: false
+        description: Opaque cursor token from a previous response's `page.next_cursor` or `page.prev_cursor`. Round-trip it as-is — do not decode or modify.
+        name: cursor
+        in: query
+      - schema:
+          type: string
+          pattern: ^(?:-?\w+)?(?:,(?:-?\w+)?)*$
+          description: Sort by one or more keys. Prefix with `-` for descending order; comma-separated for multi-key sorts.
+          example: -announced_date
+        required: false
+        description: Sort by one or more keys. Prefix with `-` for descending order; comma-separated for multi-key sorts.
+        name: sort
+        in: query
+      - schema:
+          type: boolean
+          description: Pass `true` to compute `page.total` (the matching record count). By default no count query runs and `page.total` is `null`.
+          example: true
+        required: false
+        description: Pass `true` to compute `page.total` (the matching record count). By default no count query runs and `page.total` is `null`.
+        name: include_total
+        in: query
+      - schema:
+          type: string
+          description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+          example: EUR
+        required: false
+        description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+        name: currency
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: List of funds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundListResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: The request was malformed or failed validation.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '402':
+          description: '`CREDITS_EXHAUSTED` — the caller''s team has no credits left, or none granted yet. Only API-key and MCP requests are capped.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+        '503':
+          description: '`SERVICE_UNAVAILABLE` — the caller''s team credits could not be checked. Retry shortly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: SERVICE_UNAVAILABLE
+                  message: The service is temporarily unavailable.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+  /data/funds/{id}:
+    get:
+      operationId: getFund
+      security:
+      - oauth2:
+        - read:entities
+      - bearerAuth:
+        - read:entities
+      tags:
+      - Funds
+      summary: Get single fund
+      description: Returns one fund by its stable Dealroom fund id, including the manager (GP) that raised it. `amount` is the fund size in the requested `?currency=` (default USD); `amount_source` carries the original native amount.
+      parameters:
+      - schema:
+          type: string
+          minLength: 1
+          example: '901234'
+          description: Numeric Dealroom fund ID.
+        required: true
+        description: Numeric Dealroom fund ID.
+        name: id
+        in: path
+      - schema:
+          type: string
+          description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+          example: EUR
+        required: false
+        description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+        name: currency
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Single fund
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundDetailResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '400':
+          description: Invalid fund ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: The request was malformed or failed validation.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '402':
+          description: '`CREDITS_EXHAUSTED` — the caller''s team has no credits left, or none granted yet. Only API-key and MCP requests are capped.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '404':
+          description: Fund not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: NOT_FOUND
+                  message: The requested resource was not found.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+        '503':
+          description: '`SERVICE_UNAVAILABLE` — the caller''s team credits could not be checked. Retry shortly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: SERVICE_UNAVAILABLE
+                  message: The service is temporarily unavailable.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+components:
+  schemas:
+    Fund:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Stable Dealroom fund id (source `bobjects_funds.id`).
+          example: 20386
+        name:
+          type:
+          - string
+          - 'null'
+          description: Fund name as reported.
+          example: Anterra F&A Ventures III
+        fund_type:
+          type:
+          - string
+          - 'null'
+          description: Fund category — one of `Venture Capital`, `Private Equity`, `Growth Equity`, `Corporate`, `Life Sciences`, `Renewables`, `Fund of Funds`, `Other`.
+          example: Venture Capital
+        amount:
+          type:
+          - number
+          - 'null'
+          description: Fund size in the requested response `currency` (the top-level envelope `currency`, default USD), converted from the native amount. Null when the source amount is unknown or its native currency has no exchange rate.
+          example: 92000000
+        amount_source:
+          $ref: '#/components/schemas/FundAmountSource'
+        announced_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Day the fund was announced.
+          example: '2024-03-01'
+        is_closed:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the fund is closed to new commitments.
+          example: false
+        source_url:
+          type:
+          - string
+          - 'null'
+          description: External news / press URL announcing the fund.
+          example: https://techfundingnews.com/anterra-closes-fund-iii/
+        manager:
+          $ref: '#/components/schemas/EntityRef'
+      required:
+      - id
+      - name
+      - fund_type
+      - amount
+      - amount_source
+      - announced_date
+      - is_closed
+      - source_url
+      - manager
+    CappedPaginationPage:
+      type: object
+      properties:
+        total:
+          type:
+          - number
+          - 'null'
+        limit:
+          type: number
+        offset:
+          type: number
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque cursor for the next page. Null when no further pages exist.
+        prev_cursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque cursor for the previous page. Null when on the first page.
+        capped:
+          type: boolean
+          description: True when the requested page size was reduced to the per-tier/ecosystem row cap.
+        tier:
+          $ref: '#/components/schemas/AccessTier'
+        ecosystem:
+          type:
+          - string
+          - 'null'
+          description: Slug of the active ecosystem subdomain, or null when none is in scope.
+      required:
+      - total
+      - limit
+      - offset
+      - next_cursor
+      - prev_cursor
+      - capped
+      - tier
+      - ecosystem
+    FundListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fund'
+        page:
+          $ref: '#/components/schemas/CappedPaginationPage'
+        currency:
+          type: string
+          description: Requested response currency (default USD) — the currency `amount` is expressed in. The original native value is in `amount_source`.
+          example: EUR
+      required:
+      - data
+      - page
+      - currency
+    OrganizationSubtype:
+      type: string
+      enum:
+      - company
+      - university
+      - gov_ngo
+      - investor
+      description: 'The kind of organization: company, university, gov_ngo or investor.'
+    AccessTier:
+      type: string
+      enum:
+      - anonymous
+      - free
+      - premium
+      description: 'The access tier applied to this request (anonymous, free, premium). API-key callers report premium: they receive the full field set and are not page-capped.'
+    FundAmountSource:
+      type: object
+      properties:
+        amount:
+          type:
+          - number
+          - 'null'
+          description: Fund size as stored, in the fund's own native currency.
+          example: 100000000
+        currency:
+          type:
+          - string
+          - 'null'
+          description: ISO 4217 code of the fund's native currency.
+          example: CAD
+      required:
+      - amount
+      - currency
+      description: The original as-stored fund size and its native currency, before conversion.
+    EntityType:
+      type: string
+      enum:
+      - organization
+      - person
+      description: 'Top-level entity type: `organization` or `person`.'
+    EntityRef:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Stable UUID of the entity.
+        type:
+          $ref: '#/components/schemas/EntityType'
+        subtype:
+          anyOf:
+          - $ref: '#/components/schemas/OrganizationSubtype'
+          - type: 'null'
+          description: Organization subtype; always null for a person.
+        name:
+          type: string
+          description: Display name.
+        image:
+          type:
+          - string
+          - 'null'
+          description: Absolute image URL; null when none.
+        dealroom_url:
+          type:
+          - string
+          - 'null'
+          description: Canonical profile URL on app.dealroom.co.
+      required:
+      - uuid
+      - type
+      - subtype
+      - name
+      - image
+      - dealroom_url
+      description: 'The identity of an entity embedded in another entity''s response. Closed: richer detail lives on the sub-resource, where tier redaction can reach it.'
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - VALIDATION_ERROR
+              - NOT_FOUND
+              - UNAUTHORIZED
+              - DATABASE_ERROR
+              - UNKNOWN_FILTER
+              - FILTER_VALIDATION_ERROR
+              - UNSUPPORTED_OPERATOR
+              - FILTER_PARSE_ERROR
+              - QUERY_TIMEOUT
+              - INTERNAL_SERVER_ERROR
+              - INVALID_ENTITY_ID
+              - PAGINATION_DEPTH_EXCEEDED
+              - SCHEMA_ERROR
+              - FORBIDDEN
+              - EXTERNAL_SERVICE_ERROR
+              - ACCOUNT_REQUIRED
+              - INSTANCE_ACCESS_REQUIRED
+              - SERVICE_UNAVAILABLE
+              - RATE_LIMITED
+              - CREDITS_EXHAUSTED
+              - LIST_LOCKED
+              - PATH_RENAMED
+              - ENDPOINT_REMOVED
+              description: Stable machine-readable error code.
+            message:
+              type: string
+            details:
+              anyOf:
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                    message:
+                      type: string
+                  required:
+                  - path
+                  - message
+              - type: object
+                additionalProperties:
+                  anyOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+              - type: 'null'
+          required:
+          - code
+          - message
+          - details
+      required:
+      - error
+    FundDetailResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Fund'
+        currency:
+          type: string
+          description: Requested response currency (default USD) — the currency `amount` is expressed in. The original native value is in `amount_source`.
+          example: EUR
+      required:
+      - data
+      - currency
+  headers:
+    Sunset:
+      description: 'Present when the request pinned a superseded version: the date the version stops working and requests begin returning `400` (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+    Deprecation:
+      description: 'Present when the request pinned a superseded version: the date that version was deprecated (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+    X-Credits-Used:
+      description: Credits this request consumed, under the current credit schedule. Present on every response to an API-key request under `/data`, `/analytics` and `/reference`; `0` on an error response or a free endpoint. Absent when the request was not authenticated with an API key (so never on a `401`), or on unmetered endpoints. During open beta credits are drawn from the team's balance but not billed.
+      schema:
+        type: integer
+        minimum: 0
+      example: 25
+  parameters:
+    ApiVersion:
+      name: API-Version
+      in: header
+      required: false
+      schema:
+        type: string
+        format: date
+        example: '2026-10-09'
+      description: Pin a Stripe-style date-based API version (`YYYY-MM-DD`). Omit to use the latest version (`2026-10-09`). A pinned version is supported for 30 days after it is superseded, after which it returns `400`.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 JWT access token. Paste a token obtained from your preferred OAuth2 flow. For machine-to-machine use, the OAuth2 client_credentials scheme below can mint a token directly from your `client_id` / `client_secret` inside the Swagger UI Authorize dialog.
+    oauth2:
+      type: oauth2
+      description: OAuth2 client-credentials flow against the Dealroom Auth0 tenant. Use the `client_id` / `client_secret` from a Programmatic API key. Tokens are valid for 24h — Swagger UI will reuse the same token across operations. Revoking or deactivating a key rejects it on the next request (within a ≤5-minute server-side cache window), not at token expiry.
+      flows:
+        clientCredentials:
+          tokenUrl: https://accounts.dealroom.co/oauth/token
+          scopes:
+            read:entities: Grant the read:entities permission
+            read:transactions: Grant the read:transactions permission
+            read:valuations: Grant the read:valuations permission
+            read:investors: Grant the read:investors permission
+            read:founders: Grant the read:founders permission
+            read:dimensions: Grant the read:dimensions permission
+            read:timeseries: Grant the read:timeseries permission
+            read:aggregate: Grant the read:aggregate permission
+            read:news: Grant the read:news permission
+            read:jobs: Grant the read:jobs permission
+            read:people: Grant the read:people permission
+            read:search: Grant the read:search permission
+x-tagGroups:
+- name: Data
+  tags:
+  - Entities
+  - Companies
+  - Universities
+  - Government & NGO
+  - Transactions
+  - Valuations
+  - Investors
+  - Funds
+  - People
+  - Founders
+  - News
+  - Jobs
+  - Search
+- name: Analytics
+  tags:
+  - Aggregate
+  - Timeseries
+- name: Reference
+  tags:
+  - Discovery
+  - Filters
+x-public-contract: true

@@ -1,0 +1,255 @@
+openapi: 3.2.0
+info:
+  title: Dealroom Discovery API
+  version: '2026-10-09'
+  description: REST API for the Dealroom platform — companies, funds, founders, investors, funding rounds, valuations, taxonomy, news, and aggregate analytics across all of them. Authentication uses Auth0 (Bearer JWT or OAuth2 client_credentials). All endpoints are versioned via the `API-Version` header (Stripe-style date-based versioning).
+  contact:
+    name: Dealroom API support
+    email: support@dealroom.co
+    url: https://dealroom.co
+  termsOfService: https://dealroom.co/terms
+  license:
+    name: Proprietary — Dealroom commercial license
+    url: https://dealroom.co/terms
+servers:
+- url: https://api.dealroom.app
+  description: Production
+security:
+- bearerAuth: []
+- oauth2: []
+tags:
+- name: Discovery
+  description: API root discovery and functional namespaces.
+paths:
+  /:
+    get:
+      operationId: getApiRoot
+      security: []
+      tags:
+      - Discovery
+      summary: API Root Discovery
+      description: Programmatic entry point for the Dealroom API. Returns available functional namespaces and links to documentation. Follow a namespace `url` to discover the resources it contains.
+      responses:
+        '200':
+          description: API discovery metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoveryResponse'
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+      parameters:
+      - $ref: '#/components/parameters/ApiVersion'
+  /data:
+    get:
+      operationId: getDataNamespace
+      security: []
+      tags:
+      - Discovery
+      summary: Data Namespace Discovery
+      description: 'Lists the resources available under the `data` namespace. Raw domain data: companies, investors, founders, people, funding rounds, valuations, news, jobs, and cross-resource search.'
+      responses:
+        '200':
+          description: data namespace metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamespaceDiscoveryResponse'
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+      parameters:
+      - $ref: '#/components/parameters/ApiVersion'
+  /analytics:
+    get:
+      operationId: getAnalyticsNamespace
+      security: []
+      tags:
+      - Discovery
+      summary: Analytics Namespace Discovery
+      description: 'Lists the resources available under the `analytics` namespace. Computed metrics: composable single- and multi-metric aggregates and yearly entity timeseries.'
+      responses:
+        '200':
+          description: analytics namespace metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamespaceDiscoveryResponse'
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+      parameters:
+      - $ref: '#/components/parameters/ApiVersion'
+  /reference:
+    get:
+      operationId: getReferenceNamespace
+      security: []
+      tags:
+      - Discovery
+      summary: Reference Namespace Discovery
+      description: 'Lists the resources available under the `reference` namespace. Taxonomy & discovery: filters and curated landscapes.'
+      responses:
+        '200':
+          description: reference namespace metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamespaceDiscoveryResponse'
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+      parameters:
+      - $ref: '#/components/parameters/ApiVersion'
+components:
+  headers:
+    Sunset:
+      description: 'Present when the request pinned a superseded version: the date the version stops working and requests begin returning `400` (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+    Deprecation:
+      description: 'Present when the request pinned a superseded version: the date that version was deprecated (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+  schemas:
+    DiscoveryResponse:
+      type: object
+      properties:
+        version:
+          type: string
+          example: '2026-06-15'
+        groups:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              description:
+                type: string
+              url:
+                type: string
+            required:
+            - description
+            - url
+            example:
+              description: Core domain entities (companies, investors, founders).
+              url: /data
+        docs:
+          type: string
+          format: uri
+          example: https://developers.dealroom.co
+        openapi:
+          type: string
+          example: /openapi
+      required:
+      - version
+      - groups
+      - docs
+    NamespaceDiscoveryResponse:
+      type: object
+      properties:
+        version:
+          type: string
+          example: '2026-06-15'
+        namespace:
+          type: string
+          example: data
+        description:
+          type: string
+        resources:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              description:
+                type: string
+              url:
+                type: string
+            required:
+            - description
+            - url
+            example:
+              description: Core domain entities (companies, investors, founders).
+              url: /data
+        docs:
+          type: string
+          format: uri
+          example: https://developers.dealroom.co
+        openapi:
+          type: string
+          example: /openapi
+      required:
+      - version
+      - namespace
+      - description
+      - resources
+      - docs
+  parameters:
+    ApiVersion:
+      name: API-Version
+      in: header
+      required: false
+      schema:
+        type: string
+        format: date
+        example: '2026-10-09'
+      description: Pin a Stripe-style date-based API version (`YYYY-MM-DD`). Omit to use the latest version (`2026-10-09`). A pinned version is supported for 30 days after it is superseded, after which it returns `400`.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 JWT access token. Paste a token obtained from your preferred OAuth2 flow. For machine-to-machine use, the OAuth2 client_credentials scheme below can mint a token directly from your `client_id` / `client_secret` inside the Swagger UI Authorize dialog.
+    oauth2:
+      type: oauth2
+      description: OAuth2 client-credentials flow against the Dealroom Auth0 tenant. Use the `client_id` / `client_secret` from a Programmatic API key. Tokens are valid for 24h — Swagger UI will reuse the same token across operations. Revoking or deactivating a key rejects it on the next request (within a ≤5-minute server-side cache window), not at token expiry.
+      flows:
+        clientCredentials:
+          tokenUrl: https://accounts.dealroom.co/oauth/token
+          scopes:
+            read:entities: Grant the read:entities permission
+            read:transactions: Grant the read:transactions permission
+            read:valuations: Grant the read:valuations permission
+            read:investors: Grant the read:investors permission
+            read:founders: Grant the read:founders permission
+            read:dimensions: Grant the read:dimensions permission
+            read:timeseries: Grant the read:timeseries permission
+            read:aggregate: Grant the read:aggregate permission
+            read:news: Grant the read:news permission
+            read:jobs: Grant the read:jobs permission
+            read:people: Grant the read:people permission
+            read:search: Grant the read:search permission
+x-tagGroups:
+- name: Data
+  tags:
+  - Entities
+  - Companies
+  - Universities
+  - Government & NGO
+  - Transactions
+  - Valuations
+  - Investors
+  - Funds
+  - People
+  - Founders
+  - News
+  - Jobs
+  - Search
+- name: Analytics
+  tags:
+  - Aggregate
+  - Timeseries
+- name: Reference
+  tags:
+  - Discovery
+  - Filters
+x-public-contract: true

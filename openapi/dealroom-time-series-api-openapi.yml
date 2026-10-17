@@ -1,0 +1,423 @@
+openapi: 3.2.0
+info:
+  title: Dealroom Timeseries API
+  version: '2026-10-09'
+  description: REST API for the Dealroom platform — companies, funds, founders, investors, funding rounds, valuations, taxonomy, news, and aggregate analytics across all of them. Authentication uses Auth0 (Bearer JWT or OAuth2 client_credentials). All endpoints are versioned via the `API-Version` header (Stripe-style date-based versioning).
+  contact:
+    name: Dealroom API support
+    email: support@dealroom.co
+    url: https://dealroom.co
+  termsOfService: https://dealroom.co/terms
+  license:
+    name: Proprietary — Dealroom commercial license
+    url: https://dealroom.co/terms
+servers:
+- url: https://api.dealroom.app
+  description: Production
+security:
+- bearerAuth: []
+- oauth2: []
+tags:
+- name: Time Series
+  description: Yearly entity metrics (employees, revenue, valuation).
+paths:
+  /analytics/timeseries:
+    get:
+      operationId: getTimeseries
+      security:
+      - oauth2:
+        - read:timeseries
+      - bearerAuth:
+        - read:timeseries
+      tags:
+      - Time Series
+      summary: Timeseries
+      description: 'Returns yearly values for a single metric across filtered entities.
+
+
+        **Value metrics:** `employees`, `revenue`, `valuation`, `ebitda`, `vc_funding` — aggregated per year with the chosen aggregation.
+
+
+        **Count metrics:** `unicorns` (from `entities.year_became_unicorn`) and `vc_backed` (from a company''s first VC-type funding round) — a cumulative count of companies that had reached the status as of each year. The `aggregation` param is ignored for these.
+
+
+        **Aggregations:** `sum` (default), `avg`, `median`, `count`
+
+
+        **Entity filters:** Use the `filter` parameter with the same syntax as `/analytics/aggregate/:source`.
+
+        Filters apply to entity-level fields (e.g. `launch_year`, `total_funding`).
+
+
+        **Grouping is not supported** — this endpoint returns a single ungrouped series for the requested `metric`; a `group_by` parameter, if provided, is ignored. For grouped aggregations use `/analytics/aggregate/:source` with `group_by`.'
+      parameters:
+      - schema:
+          type: string
+          enum:
+          - employees
+          - revenue
+          - valuation
+          - ebitda
+          - vc_funding
+          - unicorns
+          - vc_backed
+          description: Metric to return per year. Value metrics are aggregated; count metrics (e.g. `unicorns`) return a cumulative count.
+          example: revenue
+        required: true
+        description: Metric to return per year. Value metrics are aggregated; count metrics (e.g. `unicorns`) return a cumulative count.
+        name: metric
+        in: query
+      - schema:
+          type: string
+          enum:
+          - sum
+          - avg
+          - median
+          - count
+          default: sum
+          description: 'Aggregation function to apply (default: sum)'
+          example: sum
+        required: false
+        description: 'Aggregation function to apply (default: sum)'
+        name: aggregation
+        in: query
+      - schema:
+          type: string
+          pattern: ^\d+$
+          description: Minimum year (inclusive)
+          example: '2018'
+        required: false
+        description: Minimum year (inclusive)
+        name: year_min
+        in: query
+      - schema:
+          type: string
+          pattern: ^\d+$
+          description: Maximum year (inclusive)
+          example: '2024'
+        required: false
+        description: Maximum year (inclusive)
+        name: year_max
+        in: query
+      - schema:
+          type: string
+          description: 'Entity filter expression: key[op]:value. Same syntax as /analytics/aggregate/:source'
+          example: total_funding[gte]:1000000
+        required: false
+        description: 'Entity filter expression: key[op]:value. Same syntax as /analytics/aggregate/:source'
+        name: filter
+        in: query
+      - schema:
+          type: string
+          description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+          example: EUR
+        required: false
+        description: ISO 4217 currency code for monetary field conversion. Defaults to USD.
+        name: currency
+        in: query
+      - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Yearly aggregated metric values
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeseriesResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: The request was malformed or failed validation.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '401':
+          description: Authentication required. The `Authorization` header was missing, the bearer token was malformed, or the token failed signature / expiry validation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Authentication required — provide a valid bearer token.
+                  details: null
+          headers:
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '402':
+          description: '`CREDITS_EXHAUSTED` — the caller''s team has no credits left, or none granted yet. Only API-key and MCP requests are capped.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+        '403':
+          description: Authentication succeeded but the caller's token does not include the permission required for this operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: FORBIDDEN
+                  message: You do not have permission to perform this action.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+        '429':
+          description: Rate limit exceeded.
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+            Deprecation:
+              $ref: '#/components/headers/Deprecation'
+            Sunset:
+              $ref: '#/components/headers/Sunset'
+            Retry-After:
+              schema:
+                type: string
+                description: Seconds to wait before retrying.
+                example: '1'
+              required: true
+              description: Seconds to wait before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Rate limit exceeded — retry after the delay in the `Retry-After` header.
+                  details: null
+        '503':
+          description: '`SERVICE_UNAVAILABLE` — the caller''s team credits could not be checked. Retry shortly.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: SERVICE_UNAVAILABLE
+                  message: The service is temporarily unavailable.
+                  details: null
+          headers:
+            X-Credits-Used:
+              $ref: '#/components/headers/X-Credits-Used'
+components:
+  headers:
+    Sunset:
+      description: 'Present when the request pinned a superseded version: the date the version stops working and requests begin returning `400` (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+    X-Credits-Used:
+      description: Credits this request consumed, under the current credit schedule. Present on every response to an API-key request under `/data`, `/analytics` and `/reference`; `0` on an error response or a free endpoint. Absent when the request was not authenticated with an API key (so never on a `401`), or on unmetered endpoints. During open beta credits are drawn from the team's balance but not billed.
+      schema:
+        type: integer
+        minimum: 0
+      example: 25
+    Deprecation:
+      description: 'Present when the request pinned a superseded version: the date that version was deprecated (`YYYY-MM-DD`).'
+      schema:
+        type: string
+        format: date
+  parameters:
+    ApiVersion:
+      name: API-Version
+      in: header
+      required: false
+      schema:
+        type: string
+        format: date
+        example: '2026-10-09'
+      description: Pin a Stripe-style date-based API version (`YYYY-MM-DD`). Omit to use the latest version (`2026-10-09`). A pinned version is supported for 30 days after it is superseded, after which it returns `400`.
+  schemas:
+    TimeseriesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              year:
+                type: integer
+              value:
+                type:
+                - number
+                - 'null'
+            required:
+            - year
+            - value
+        query_info:
+          type: object
+          properties:
+            metric:
+              type: string
+              enum:
+              - employees
+              - revenue
+              - valuation
+              - ebitda
+              - vc_funding
+              - unicorns
+              - vc_backed
+            aggregation:
+              type: string
+              enum:
+              - sum
+              - avg
+              - median
+              - count
+            years_count:
+              type: integer
+            timing_ms:
+              type: number
+          required:
+          - metric
+          - aggregation
+          - years_count
+          - timing_ms
+        currency:
+          type: string
+      required:
+      - data
+      - query_info
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - VALIDATION_ERROR
+              - NOT_FOUND
+              - UNAUTHORIZED
+              - DATABASE_ERROR
+              - UNKNOWN_FILTER
+              - FILTER_VALIDATION_ERROR
+              - UNSUPPORTED_OPERATOR
+              - FILTER_PARSE_ERROR
+              - QUERY_TIMEOUT
+              - INTERNAL_SERVER_ERROR
+              - INVALID_ENTITY_ID
+              - PAGINATION_DEPTH_EXCEEDED
+              - SCHEMA_ERROR
+              - FORBIDDEN
+              - EXTERNAL_SERVICE_ERROR
+              - ACCOUNT_REQUIRED
+              - INSTANCE_ACCESS_REQUIRED
+              - SERVICE_UNAVAILABLE
+              - RATE_LIMITED
+              - CREDITS_EXHAUSTED
+              - LIST_LOCKED
+              - PATH_RENAMED
+              - ENDPOINT_REMOVED
+              description: Stable machine-readable error code.
+            message:
+              type: string
+            details:
+              anyOf:
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                    message:
+                      type: string
+                  required:
+                  - path
+                  - message
+              - type: object
+                additionalProperties:
+                  anyOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+              - type: 'null'
+          required:
+          - code
+          - message
+          - details
+      required:
+      - error
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Auth0 JWT access token. Paste a token obtained from your preferred OAuth2 flow. For machine-to-machine use, the OAuth2 client_credentials scheme below can mint a token directly from your `client_id` / `client_secret` inside the Swagger UI Authorize dialog.
+    oauth2:
+      type: oauth2
+      description: OAuth2 client-credentials flow against the Dealroom Auth0 tenant. Use the `client_id` / `client_secret` from a Programmatic API key. Tokens are valid for 24h — Swagger UI will reuse the same token across operations. Revoking or deactivating a key rejects it on the next request (within a ≤5-minute server-side cache window), not at token expiry.
+      flows:
+        clientCredentials:
+          tokenUrl: https://accounts.dealroom.co/oauth/token
+          scopes:
+            read:entities: Grant the read:entities permission
+            read:transactions: Grant the read:transactions permission
+            read:valuations: Grant the read:valuations permission
+            read:investors: Grant the read:investors permission
+            read:founders: Grant the read:founders permission
+            read:dimensions: Grant the read:dimensions permission
+            read:timeseries: Grant the read:timeseries permission
+            read:aggregate: Grant the read:aggregate permission
+            read:news: Grant the read:news permission
+            read:jobs: Grant the read:jobs permission
+            read:people: Grant the read:people permission
+            read:search: Grant the read:search permission
+x-tagGroups:
+- name: Data
+  tags:
+  - Entities
+  - Companies
+  - Universities
+  - Government & NGO
+  - Transactions
+  - Valuations
+  - Investors
+  - Funds
+  - People
+  - Founders
+  - News
+  - Jobs
+  - Search
+- name: Analytics
+  tags:
+  - Aggregate
+  - Timeseries
+- name: Reference
+  tags:
+  - Discovery
+  - Filters
+x-public-contract: true
